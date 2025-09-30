@@ -21,6 +21,7 @@
                 <tr>
                     <th>@Html.DisplayNameFor(model => model.Productos[0].Id)</th>
                     <th>@Html.DisplayNameFor(model => model.Productos[0].NombreProducto)</th>
+                    <th>@Html.DisplayNameFor(model => model.Productos[0].Categoria)</th>
                     <th>@Html.DisplayNameFor(model => model.Productos[0].Descripcion)</th>
                     <th>@Html.DisplayNameFor(model => model.Productos[0].PrecioUnitario)</th>
                     <th>@Html.DisplayNameFor(model => model.Productos[0].Stock)</th>
@@ -38,6 +39,7 @@
                         <tr>
                             <td>@Html.DisplayFor(model => producto.Id)</td>
                             <td>@Html.DisplayFor(model => producto.NombreProducto)</td>
+                            <td>@Html.DisplayFor(modelItem => producto.Categoria)</td>
                             <td>@Html.DisplayFor(model => producto.Descripcion)</td>
                             <td>@Html.DisplayFor(model => producto.PrecioUnitario)</td>
                             <td>@Html.DisplayFor(model => producto.Stock)</td>

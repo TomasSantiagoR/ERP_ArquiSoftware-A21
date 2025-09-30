@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema; 
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ERP_ArquiSoftware.Models
 {
-    public class Producto
+    public class Proveedor
     {
         public int Id { get; set; }
 
@@ -43,4 +43,3 @@ namespace ERP_ArquiSoftware.Models
         public DateTime FechaCreacion { get; set; } = DateTime.Now;
     }
 }
-
