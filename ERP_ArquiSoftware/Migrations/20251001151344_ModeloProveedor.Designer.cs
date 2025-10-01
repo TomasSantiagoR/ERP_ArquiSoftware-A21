@@ -4,6 +4,7 @@ using ERP_ArquiSoftware.dA;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ERP_ArquiSoftware.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    partial class AppDBContextModelSnapshot : ModelSnapshot
+    [Migration("20251001151344_ModeloProveedor")]
+    partial class ModeloProveedor
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -119,7 +122,7 @@ namespace ERP_ArquiSoftware.Migrations
 
                     b.Property<string>("NIT")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NombreRazonSocial")
                         .IsRequired()
@@ -136,9 +139,6 @@ namespace ERP_ArquiSoftware.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CategoriaId");
-
-                    b.HasIndex("NIT")
-                        .IsUnique();
 
                     b.ToTable("Proveedores");
                 });

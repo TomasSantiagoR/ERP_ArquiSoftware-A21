@@ -1,72 +1,85 @@
 ﻿@page
 @model ERP_ArquiSoftware.Pages.Inventario.IndexInvModel
 @{
-    ViewData["Title"] = "Modulo Inventario";
+    ViewData["Title"] = "Módulo Inventario";
 }
 
 @section Styles {
     <link rel="stylesheet" href="~/css/inventario/invindex.css" />
 }
 
-<a asp-page="CreateInv" class="btn btn-primary">Ingresar Nuevo Producto</a>
-
+<a asp-page="CreateInv" class="btn btn-primary mb-2">Ingresar Nuevo Producto</a>
 
 <div class="card shadow mt-2">
     <div class="card-header">
         <h3>@ViewData["Title"]</h3>
     </div>
     <div class="card-body">
-        <table class="table-striped table-hover table-responsive">
-            <thead>
-                <tr>
-                    <th>@Html.DisplayNameFor(model => model.Productos[0].Id)</th>
-                    <th>@Html.DisplayNameFor(model => model.Productos[0].NombreProducto)</th>
-                    <th>@Html.DisplayNameFor(model => model.Productos[0].Categoria)</th>
-                    <th>@Html.DisplayNameFor(model => model.Productos[0].Descripcion)</th>
-                    <th>@Html.DisplayNameFor(model => model.Productos[0].PrecioUnitario)</th>
-                    <th>@Html.DisplayNameFor(model => model.Productos[0].Stock)</th>
-                    <th>@Html.DisplayNameFor(model => model.Productos[0].StockMin)</th>
-                    <th>@Html.DisplayNameFor(model => model.Productos[0].Activo)</th>
-                    <th>@Html.DisplayNameFor(model => model.Productos[0].FechaCreacion)</th>
-                    <th> Acción </th>
-                </tr>
-            </thead>
-            <tbody>
-                @if(Model.Productos != null && Model.Productos.Any())
-                {
-                    @foreach (var producto in Model.Productos)
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>@Html.DisplayNameFor(m => m.Productos[0].Id)</th>
+                        <th>@Html.DisplayNameFor(m => m.Productos[0].NombreProducto)</th>
+                        <th>Categoría</th>
+                        <th>@Html.DisplayNameFor(m => m.Productos[0].Descripcion)</th>
+                        <th>@Html.DisplayNameFor(m => m.Productos[0].PrecioUnitario)</th>
+                        <th>@Html.DisplayNameFor(m => m.Productos[0].Stock)</th>
+                        <th>@Html.DisplayNameFor(m => m.Productos[0].StockMin)</th>
+                        <th>@Html.DisplayNameFor(m => m.Productos[0].Activo)</th>
+                        <th>@Html.DisplayNameFor(m => m.Productos[0].FechaCreacion)</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Productos != null && Model.Productos.Any())
+                    {
+                        foreach (var producto in Model.Productos)
+                        {
+                            <tr>
+                                <td>@producto.Id</td>
+                                <td>@producto.NombreProducto</td>
+                                <td>@(producto.Categoria?.Nombre ?? "—")</td>
+                                <td>@producto.Descripcion</td>
+                                <td>@producto.PrecioUnitario.ToString("C")</td>
+                                <td>@producto.Stock</td>
+                                <td>@producto.StockMin</td>
+                                <td>
+                                    @if (producto.Activo)
+                                    {
+                                        <span class="badge bg-success">Activo</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Inactivo</span>
+                                    }
+                                </td>
+                                <td>@producto.FechaCreacion.ToString("yyyy-MM-dd")</td>
+                                <td class="d-flex gap-2">
+                                    <a asp-page="/Inventario/EditInv" asp-route-id="@producto.Id" class="btn btn-sm btn-primary">
+                                        Editar
+                                    </a>
+
+                                    <form method="post" asp-page-handler="Delete" asp-route-id="@producto.Id"
+                                          onsubmit="return confirm('¿Confirmar eliminación del producto?')">
+                                        <button type="submit" class="btn btn-sm btn-danger">Borrar</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
                     {
                         <tr>
-                            <td>@Html.DisplayFor(model => producto.Id)</td>
-                            <td>@Html.DisplayFor(model => producto.NombreProducto)</td>
-                            <td>@Html.DisplayFor(modelItem => producto.Categoria)</td>
-                            <td>@Html.DisplayFor(model => producto.Descripcion)</td>
-                            <td>@Html.DisplayFor(model => producto.PrecioUnitario)</td>
-                            <td>@Html.DisplayFor(model => producto.Stock)</td>
-                            <td>@Html.DisplayFor(model => producto.StockMin)</td>
-                            <td>@Html.DisplayFor(model => producto.Activo)</td>
-                            <td>@Html.DisplayFor(model => producto.FechaCreacion)</td>
-                            <td>
-                                <a asp-page="/Inventario/EditInv" asp-route-id="@producto.Id" class="btn btn-primary">Editar</a>
-
-                                <form method="post" asp-page-handler="Delete" asp-route-id="@producto.Id" onsubmit="return confirm('Confirmar accion')">
-                                    <button type="submit" class="btn btn-danger">Borrar</button>
-                                </form>
+                            <td colspan="10" class="text-center py-4">
+                                No hay productos disponibles en este momento.
                             </td>
                         </tr>
                     }
-                }
-                else
-                {
-                    <tr>
-                        <td colspan="9">
-                            No hay productos disponibles en este momento
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
+
     </div>
-
 </div>
-

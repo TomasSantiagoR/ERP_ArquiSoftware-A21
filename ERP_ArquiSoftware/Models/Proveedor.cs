@@ -8,35 +8,48 @@ namespace ERP_ArquiSoftware.Models
     {
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "El nombre del producto es obligatorio")]
-        [DisplayName("Nombre del Producto")]
-        public string NombreProducto { get; set; } = string.Empty;
+        // Datos Generales
+        [Required(ErrorMessage = "El nombre o razón social es obligatorio")]
+        [DisplayName("Nombre o Razón Social")]
+        public string NombreRazonSocial { get; set; } = string.Empty;
 
+        [Required(ErrorMessage = "El NIT es obligatorio")]
+        [DisplayName("NIT")]
+        public string NIT { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El tipo de proveedor es obligatorio")]
+        [DisplayName("Tipo de Proveedor")]
+        public string TipoProveedor { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El correo electrónico es obligatorio")]
+        [EmailAddress(ErrorMessage = "El correo no tiene un formato válido")]
+        [DisplayName("Correo Electrónico")]
+        public string CorreoElectronico { get; set; } = string.Empty;
+
+
+        // Datos Comerciales
         [Required(ErrorMessage = "La categoría es obligatoria")]
+        [DisplayName("Categoría Productos/Servicios")]
+        public int CategoriaId { get; set; }
+
         [DisplayName("Categoría")]
-        public string Categoria { get; set; } = string.Empty;
+        public Categoria? Categoria { get; set; }   // 🔗 Navegación a la misma tabla de categorías
+
+        [DisplayName("Condiciones de Pago")]
+        public string CondicionesPago { get; set; } = string.Empty;
+
+        [DisplayName("Cuenta Bancaria")]
+        public string CuentaBancaria { get; set; } = string.Empty;
+
+        [DisplayName("Representante Legal")]
+        public string RepresentanteLegal { get; set; } = string.Empty;
 
 
-        [DisplayName("Descripción")]
-        public string Descripcion { get; set; } = string.Empty;
+        // Documentos y Estado
+        [DisplayName("Documentos")]
+        public string Documentos { get; set; } = string.Empty;
 
-
-        [Required(ErrorMessage = "El precio del producto es obligatorio")]
-        [DisplayName("Precio Unitario")]
-        [Range(0, double.MaxValue, ErrorMessage = "El precio debe ser mayor o igual a 0")]
-        [Column(TypeName = "decimal(18,2)")]   // 👈 especifica precisión y escala en SQL Server
-        public decimal PrecioUnitario { get; set; }
-
-        [Required(ErrorMessage = "El stock del producto es obligatorio")]
-        [DisplayName("Stock Actual")]
-        [Range(0, int.MaxValue, ErrorMessage = "El stock no puede ser negativo")]
-        public int Stock { get; set; }
-
-        [Required(ErrorMessage = "El stock minimo del producto es obligatorio")]
-        [DisplayName("Stock Mínimo")]
-        [Range(0, int.MaxValue, ErrorMessage = "El stock mínimo no puede ser negativo")]
-        public int StockMin { get; set; }
-
+        [DisplayName("Activo")]
         public bool Activo { get; set; } = true;
 
         [DisplayName("Fecha de Creación")]

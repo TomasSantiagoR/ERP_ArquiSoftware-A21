@@ -1,0 +1,109 @@
+﻿@page
+@model ERP_ArquiSoftware.Pages.Proveedores.CreateProvModel
+@{
+    ViewData["Title"] = "Registrar Proveedor";
+}
+
+<div class="card shadow">
+    <div class="card-header">
+        <h3>@ViewData["Title"]</h3>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <!-- DATOS GENERALES -->
+            <h5 class="mb-3">Datos Generales</h5>
+
+            <div class="row g-3 mb-2">
+                <div class="col-md-6">
+                    <label asp-for="Proveedor.NombreRazonSocial" class="form-label"></label>
+                    <input asp-for="Proveedor.NombreRazonSocial" class="form-control" />
+                    <span asp-validation-for="Proveedor.NombreRazonSocial" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Proveedor.NIT" class="form-label"></label>
+                    <input asp-for="Proveedor.NIT" class="form-control" />
+                    <span asp-validation-for="Proveedor.NIT" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label asp-for="Proveedor.TipoProveedor" class="form-label"></label>
+                    <input asp-for="Proveedor.TipoProveedor" class="form-control" />
+                    <span asp-validation-for="Proveedor.TipoProveedor" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Proveedor.CorreoElectronico" class="form-label"></label>
+                    <input asp-for="Proveedor.CorreoElectronico" class="form-control" />
+                    <span asp-validation-for="Proveedor.CorreoElectronico" class="text-danger"></span>
+                </div>
+            </div>
+
+            <!-- DATOS COMERCIALES -->
+            <h5 class="mb-3">Datos Comerciales</h5>
+
+            <div class="row g-3 mb-2">
+                <div class="col-md-6">
+                    <label asp-for="Proveedor.CategoriaId" class="form-label"></label>
+                    <select asp-for="Proveedor.CategoriaId"
+                            class="form-select"
+                            asp-items="Model.CategoriasSelect">
+                        <option value="">-- Seleccione Categoría --</option>
+                    </select>
+                    <span asp-validation-for="Proveedor.CategoriaId" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Proveedor.CondicionesPago" class="form-label"></label>
+                    <input asp-for="Proveedor.CondicionesPago" class="form-control" />
+                    <span asp-validation-for="Proveedor.CondicionesPago" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label asp-for="Proveedor.CuentaBancaria" class="form-label"></label>
+                    <input asp-for="Proveedor.CuentaBancaria" class="form-control" />
+                    <span asp-validation-for="Proveedor.CuentaBancaria" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Proveedor.RepresentanteLegal" class="form-label"></label>
+                    <input asp-for="Proveedor.RepresentanteLegal" class="form-control" />
+                    <span asp-validation-for="Proveedor.RepresentanteLegal" class="text-danger"></span>
+                </div>
+            </div>
+
+            <!-- DOCUMENTOS Y ESTADO -->
+            <h5 class="mb-3">Documentos y Estado</h5>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label class="form-label d-block">Estado</label>
+                    <div class="form-check form-switch">
+                        <input asp-for="Proveedor.Activo" class="form-check-input" />
+                        <label asp-for="Proveedor.Activo" class="form-check-label"></label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Proveedor.Documentos" class="form-label"></label>
+                    <input asp-for="Proveedor.Documentos" class="form-control" />
+                    <span asp-validation-for="Proveedor.Documentos" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Guardar</button>
+                <a asp-page="/Proveedores/IndexProv" class="btn btn-secondary">Volver</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+

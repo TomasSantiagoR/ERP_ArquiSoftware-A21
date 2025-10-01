@@ -4,6 +4,7 @@ using ERP_ArquiSoftware.dA;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ERP_ArquiSoftware.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    partial class AppDBContextModelSnapshot : ModelSnapshot
+    [Migration("20251001141951_SplitProductoCategoria")]
+    partial class SplitProductoCategoria
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -40,7 +43,7 @@ namespace ERP_ArquiSoftware.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categorias");
+                    b.ToTable("Categoria");
                 });
 
             modelBuilder.Entity("ERP_ArquiSoftware.Models.Producto", b =>
@@ -84,82 +87,12 @@ namespace ERP_ArquiSoftware.Migrations
                     b.ToTable("Productos");
                 });
 
-            modelBuilder.Entity("ERP_ArquiSoftware.Models.Proveedor", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("Activo")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("CategoriaId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CondicionesPago")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CorreoElectronico")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CuentaBancaria")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Documentos")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("FechaCreacion")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("NIT")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("NombreRazonSocial")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("RepresentanteLegal")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TipoProveedor")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CategoriaId");
-
-                    b.HasIndex("NIT")
-                        .IsUnique();
-
-                    b.ToTable("Proveedores");
-                });
-
             modelBuilder.Entity("ERP_ArquiSoftware.Models.Producto", b =>
                 {
                     b.HasOne("ERP_ArquiSoftware.Models.Categoria", "Categoria")
                         .WithMany("Productos")
                         .HasForeignKey("CategoriaId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Categoria");
-                });
-
-            modelBuilder.Entity("ERP_ArquiSoftware.Models.Proveedor", b =>
-                {
-                    b.HasOne("ERP_ArquiSoftware.Models.Categoria", "Categoria")
-                        .WithMany()
-                        .HasForeignKey("CategoriaId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Categoria");

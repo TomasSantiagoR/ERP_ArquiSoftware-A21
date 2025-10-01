@@ -2,7 +2,6 @@
 @model ERP_ArquiSoftware.Pages.Inventario.CreateInvModel
 @{
     ViewData["Title"] = "Crear Producto";
-
 }
 
 <div class="card shadow">
@@ -11,63 +10,67 @@
     </div>
     <div class="card-body">
         <div class="row">
-            <div class="col-6">
+            <div class="col-12 col-lg-6">
                 <form method="post">
-                    <div class="form-group">
-                        <label asp-for="Productos.NombreProducto" class="control-label"></label>
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Productos.NombreProducto" class="form-label"></label>
                         <input asp-for="Productos.NombreProducto" class="form-control" />
                         <span asp-validation-for="Productos.NombreProducto" class="text-danger"></span>
                     </div>
-                    <div class="form-group">
-                        <label asp-for="Productos.Categoria" class="control-label"></label>
-                        <select asp-for="Productos.Categoria" class="form-control">
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Productos.CategoriaId" class="form-label"></label>
+                        <select asp-for="Productos.CategoriaId" class="form-select"
+                                asp-items="Model.CategoriasSelect">
                             <option value="">-- Seleccione Categoría --</option>
-                            <option>Abarrotes</option>
-                            <option>Electrónica</option>
-                            <option>Ropa</option>
-                            <option>Hogar</option>
-                            <option>Juguetes</option>
-                            <option>Farmacia</option>
                         </select>
-                        <span asp-validation-for="Productos.Categoria" class="text-danger"></span>
+                        <span asp-validation-for="Productos.CategoriaId" class="text-danger"></span>
                     </div>
-                    <div class="form-group">
-                        <label asp-for="Productos.Descripcion" class="control-label"></label>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Productos.Descripcion" class="form-label"></label>
                         <input asp-for="Productos.Descripcion" class="form-control" />
+                        <span asp-validation-for="Productos.Descripcion" class="text-danger"></span>
                     </div>
-                    <div class="form-group">
-                        <label asp-for="Productos.PrecioUnitario" class="control-label"></label>
-                        <input asp-for="Productos.PrecioUnitario" class="form-control" />
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Productos.PrecioUnitario" class="form-label"></label>
+                        <input asp-for="Productos.PrecioUnitario" class="form-control" type="number" step="0.01" />
                         <span asp-validation-for="Productos.PrecioUnitario" class="text-danger"></span>
                     </div>
-                    <div class="form-group">
-                        <label asp-for="Productos.Stock" class="control-label"></label>
-                        <input asp-for="Productos.Stock" class="form-control" />
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Productos.Stock" class="form-label"></label>
+                        <input asp-for="Productos.Stock" class="form-control" type="number" min="0" />
                         <span asp-validation-for="Productos.Stock" class="text-danger"></span>
                     </div>
-                    <div class="form-group">
-                        <label asp-for="Productos.StockMin" class="control-label"></label>
-                        <input asp-for="Productos.StockMin" class="form-control" />
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Productos.StockMin" class="form-label"></label>
+                        <input asp-for="Productos.StockMin" class="form-control" type="number" min="0" />
                         <span asp-validation-for="Productos.StockMin" class="text-danger"></span>
                     </div>
-                    <div class="form-check form-switch mt-3">
+
+                    <div class="form-check form-switch mb-3">
                         <input asp-for="Productos.Activo" class="form-check-input" />
                         <label asp-for="Productos.Activo" class="form-check-label"></label>
                     </div>
-                    <div class="form-group mt-2">
+
+                    <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-primary">Guardar</button>
-                        <a asp-page="IndexInv" class="btn btn-success">Volver</a>
+                        <a asp-page="IndexInv" class="btn btn-secondary">Volver</a>
                     </div>
-                    
                 </form>
             </div>
         </div>
     </div>
 </div>
 
-
 @section Scripts {
-@{
+    @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }

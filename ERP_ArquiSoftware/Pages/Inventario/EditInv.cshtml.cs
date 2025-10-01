@@ -2,14 +2,13 @@ using ERP_ArquiSoftware.dA;
 using ERP_ArquiSoftware.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using System.Diagnostics.Eventing.Reader;
 
 namespace ERP_ArquiSoftware.Pages.Inventario
 {
     public class EditInvModel : PageModel
     {
-
         private readonly AppDBContext _context;
 
         public EditInvModel(AppDBContext context)
@@ -18,36 +17,62 @@ namespace ERP_ArquiSoftware.Pages.Inventario
         }
 
         [BindProperty]
+        public Producto Productos { get; set; } = new();
 
-        public Producto Productos { get; set; } = default;
+        public List<SelectListItem> CategoriasSelect { get; set; } = new();
 
-        public async Task<IActionResult> OnGetAsync(int? id)
+        public async Task<IActionResult> OnGetAsync(int id)
         {
-            if(id == null)
+            Productos = await _context.Productos
+                .AsNoTracking()
+                .FirstOrDefaultAsync(p => p.Id == id);
+
+            if (Productos == null)
             {
-                return RedirectToPage("./IndexInv");
+                return NotFound();
             }
 
-            var producto = await _context.Productos.FirstOrDefaultAsync(b => b.Id == id);
-            if (producto == null)
-            {
-                return RedirectToPage("./IndexInv");
-            }
-
-            Productos = producto;
+            await CargarCategoriasAsync();
             return Page();
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
+            await CargarCategoriasAsync();
+
             if (!ModelState.IsValid)
             {
                 return Page();
             }
 
-            _context.Update(Productos);
-            await _context.SaveChangesAsync();
-            return RedirectToPage("./IndexInv");
+            try
+            {
+                _context.Attach(Productos).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!_context.Productos.Any(p => p.Id == Productos.Id))
+                {
+                    return NotFound();
+                }
+                throw;
+            }
+
+            return RedirectToPage("IndexInv");
+        }
+
+        private async Task CargarCategoriasAsync()
+        {
+            CategoriasSelect = await _context.Categorias
+                .Where(c => c.Activa)
+                .OrderBy(c => c.Nombre)
+                .Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.Nombre
+                })
+                .ToListAsync();
         }
     }
 }

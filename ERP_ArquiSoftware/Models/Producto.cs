@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema; 
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ERP_ArquiSoftware.Models
 {
@@ -12,29 +12,28 @@ namespace ERP_ArquiSoftware.Models
         [DisplayName("Nombre del Producto")]
         public string NombreProducto { get; set; } = string.Empty;
 
+        // FK
         [Required(ErrorMessage = "La categoría es obligatoria")]
         [DisplayName("Categoría")]
-        public string Categoria { get; set; } = string.Empty;
+        public int CategoriaId { get; set; }
 
+        // Navegación
+        public Categoria? Categoria { get; set; }
 
         [DisplayName("Descripción")]
         public string Descripcion { get; set; } = string.Empty;
 
-
-        [Required(ErrorMessage = "El precio del producto es obligatorio")]
-        [DisplayName("Precio Unitario")]
-        [Range(0, double.MaxValue, ErrorMessage = "El precio debe ser mayor o igual a 0")]
-        [Column(TypeName = "decimal(18,2)")]   // 👈 especifica precisión y escala en SQL Server
+        [Required, DisplayName("Precio Unitario")]
+        [Range(0, double.MaxValue)]
+        [Column(TypeName = "decimal(18,2)")]
         public decimal PrecioUnitario { get; set; }
 
-        [Required(ErrorMessage = "El stock del producto es obligatorio")]
-        [DisplayName("Stock Actual")]
-        [Range(0, int.MaxValue, ErrorMessage = "El stock no puede ser negativo")]
+        [Required, DisplayName("Stock Actual")]
+        [Range(0, int.MaxValue)]
         public int Stock { get; set; }
 
-        [Required(ErrorMessage = "El stock minimo del producto es obligatorio")]
-        [DisplayName("Stock Mínimo")]
-        [Range(0, int.MaxValue, ErrorMessage = "El stock mínimo no puede ser negativo")]
+        [Required, DisplayName("Stock Mínimo")]
+        [Range(0, int.MaxValue)]
         public int StockMin { get; set; }
 
         public bool Activo { get; set; } = true;
@@ -43,4 +42,5 @@ namespace ERP_ArquiSoftware.Models
         public DateTime FechaCreacion { get; set; } = DateTime.Now;
     }
 }
+
 
