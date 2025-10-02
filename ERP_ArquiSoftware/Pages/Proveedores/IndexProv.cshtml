@@ -1,5 +1,6 @@
 ﻿@page
 @model ERP_ArquiSoftware.Pages.Proveedores.IndexProvModel
+@using ERP_ArquiSoftware.Models
 @{
     ViewData["Title"] = "Listado de Proveedores";
 }
@@ -9,6 +10,8 @@
         <h3 class="m-0">@ViewData["Title"]</h3>
         <a asp-page="/Proveedores/CreateProv" class="btn btn-primary">Crear proveedor</a>
     </div>
+    
+
 
     <div class="card-body">
         <form method="get" class="row g-2 mb-3">
@@ -30,21 +33,19 @@
                             <th>NIT</th>
                             <th>Tipo</th>
                             <th>Correo</th>
-                            <th>Categoría</th>
                             <th>Activo</th>
                             <th>Creado</th>
                             <th></th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var p in Model.Proveedores)
+                        @foreach (ERP_ArquiSoftware.Models.Proveedor p in Model.Proveedores)
                         {
                             <tr>
                                 <td>@p.NombreRazonSocial</td>
                                 <td>@p.NIT</td>
                                 <td>@p.TipoProveedor</td>
                                 <td>@p.CorreoElectronico</td>
-                                <td>@p.Categoria?.Nombre</td>
                                 <td>
                                     @if (p.Activo)
                                     {
@@ -73,6 +74,10 @@
             <p class="text-muted m-0">No hay proveedores que coincidan.</p>
         }
     </div>
+
+    
 </div>
+
+<a asp-page="/Proveedores/ProductosProv" class="btn btn-primary">Ver relacion</a>
 
 

@@ -42,15 +42,6 @@
 
             <!-- DATOS COMERCIALES -->
             <div class="form-group mb-3">
-                <label asp-for="Proveedor.CategoriaId" class="form-label"></label>
-                <select asp-for="Proveedor.CategoriaId" class="form-select"
-                        asp-items="Model.CategoriasSelect">
-                    <option value="">-- Seleccione Categoría --</option>
-                </select>
-                <span asp-validation-for="Proveedor.CategoriaId" class="text-danger"></span>
-            </div>
-
-            <div class="form-group mb-3">
                 <label asp-for="Proveedor.CondicionesPago" class="form-label"></label>
                 <input asp-for="Proveedor.CondicionesPago" class="form-control" />
                 <span asp-validation-for="Proveedor.CondicionesPago" class="text-danger"></span>
@@ -93,3 +84,4 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
+

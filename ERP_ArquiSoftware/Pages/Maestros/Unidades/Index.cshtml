@@ -1,0 +1,40 @@
+﻿@page
+@model ERP_ArquiSoftware.Pages.Maestros.Unidades.IndexModel
+@{
+    ViewData["Title"] = "Unidades de Medida";
+}
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <h3 class="m-0">@ViewData["Title"]</h3>
+    <a asp-page="Upsert" class="btn btn-primary">Nueva Unidad</a>
+</div>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-sm-6 col-md-4">
+        <input name="q" value="@Model.Q" class="form-control" placeholder="Buscar por código o descripción..." />
+    </div>
+    <div class="col-auto"><button class="btn btn-outline-secondary">Buscar</button></div>
+</form>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle m-0">
+            <thead><tr><th>ID</th><th>Código</th><th>Descripción</th><th>Estado</th><th></th></tr></thead>
+            <tbody>
+            @foreach (var u in Model.Items)
+            {
+                <tr>
+                    <td>@u.Id</td><td>@u.Codigo</td><td>@u.Descripcion</td>
+                    <td>@(u.Activa ? "Activa" : "Inactiva")</td>
+                    <td class="text-end">
+                        <a asp-page="Upsert" asp-route-id="@u.Id" class="btn btn-sm btn-primary">Editar</a>
+                        <form method="post" asp-page-handler="Delete" asp-route-id="@u.Id" class="d-inline"
+                              onsubmit="return confirm('¿Eliminar unidad?')">
+                            <button class="btn btn-sm btn-danger">Borrar</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>

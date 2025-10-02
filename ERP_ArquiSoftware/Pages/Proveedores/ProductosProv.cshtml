@@ -1,0 +1,255 @@
+﻿@page
+@model ERP_ArquiSoftware.Pages.Proveedores.ProductosProvModel
+@using ERP_ArquiSoftware.Models
+@{
+    ViewData["Title"] = "Proveedores y sus Productos";
+}
+
+<a asp-page="/Proveedores/IndexProv" class="btn btn-outline-secondary mb-2">Volver a Proveedores</a>
+
+<div class="card shadow mt-2">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h3 class="m-0">@ViewData["Title"]</h3>
+        <a asp-page="/Proveedores/CreateProv" class="btn btn-primary">Crear proveedor</a>
+    </div>
+
+    <div class="card-body">
+        <form method="get" class="row g-2 mb-3">
+            <div class="col-sm-6 col-md-5">
+                <input name="q" value="@Model.Q" class="form-control" placeholder="Buscar proveedor, producto, SKU o marca..." />
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-outline-secondary" type="submit">Buscar</button>
+            </div>
+        </form>
+
+        @if (Model.Proveedores?.Any() == true)
+        {
+            <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Proveedor</th>
+                            <th>NIT</th>
+                            <th>Tipo</th>
+                            <th>Correo</th>
+                            <th>Productos</th>
+                            <th>Estado</th>
+                            <th>Creado</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (Proveedor prov in Model.Proveedores)
+                        {
+                            var collapseId = $"prod-prov-{prov.Id}";
+                            var productos = prov.ProductoProveedores?
+                                .OrderBy(pp => pp.Producto.NombreProducto).ToList()
+                                ?? new List<ProductoProveedor>();
+
+                            <tr>
+                                <td>@prov.NombreRazonSocial</td>
+                                <td>@prov.NIT</td>
+                                <td>@prov.TipoProveedor</td>
+                                <td>@prov.CorreoElectronico</td>
+                                <td>@(productos.Count)</td>
+                                <td>
+                                    @if (prov.Activo) { <span class="badge bg-success">Activo</span> }
+                                    else { <span class="badge bg-secondary">Inactivo</span> }
+                                </td>
+                                <td>@prov.FechaCreacion.ToString("yyyy-MM-dd")</td>
+                                <td class="d-flex gap-2">
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-primary"
+                                            data-bs-toggle="collapse"
+                                            data-bs-target="#@collapseId"
+                                            aria-expanded="false"
+                                            aria-controls="@collapseId">
+                                        Ver productos
+                                    </button>
+
+                                    <button type="button"
+                                            class="btn btn-sm btn-success"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modalVincular"
+                                            data-prov-id="@prov.Id"
+                                            data-prov-nombre="@prov.NombreRazonSocial">
+                                        Relacionar producto
+                                    </button>
+
+                                    <a asp-page="/Proveedores/EditProv" asp-route-id="@prov.Id" class="btn btn-sm btn-primary">
+                                        Editar
+                                    </a>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td colspan="8" class="bg-light p-0">
+                                    <div class="collapse" id="@collapseId">
+                                        @if (productos.Any())
+                                        {
+                                            <div class="table-responsive p-3">
+                                                <table class="table table-sm table-borderless m-0">
+                                                    <thead class="table-light">
+                                                        <tr>
+                                                            <th style="width: 20%">Producto</th>
+                                                            <th style="width: 10%">SKU</th>
+                                                            <th style="width: 12%">Marca</th>
+                                                            <th style="width: 8%">U.M.</th>
+                                                            <th style="width: 12%">Impuesto</th>
+                                                            <th style="width: 10%">PVP</th>
+                                                            <th style="width: 12%">SKU Proveedor</th>
+                                                            <th style="width: 10%">Precio Compra</th>
+                                                            <th style="width: 8%">Plazo</th>
+                                                            <th style="width: 8%">Principal</th>
+                                                            <th style="width: 14%">Vigencia</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach (var pp in productos)
+                                                        {
+                                                            <tr>
+                                                                <td>@pp.Producto?.NombreProducto</td>
+                                                                <td>@pp.Producto?.Sku</td>
+                                                                <td>@pp.Producto?.Marca?.Nombre</td>
+                                                                <td>@pp.Producto?.UnidadMedida?.Codigo</td>
+                                                                <td>@pp.Producto?.Impuesto?.Nombre</td>
+                                                                <td>@pp.Producto?.PrecioUnitario.ToString("C")</td>
+
+                                                                <td>@(pp.SkuProveedor ?? "—")</td>
+                                                                <td>@(pp.PrecioCompra.HasValue ? pp.PrecioCompra.Value.ToString("C") : "—")</td>
+                                                                <td>@(pp.PlazoEntregaDias?.ToString() ?? "—")</td>
+                                                                <td>
+                                                                    @if (pp.EsProveedorPrincipal)
+                                                                    { <span class="badge bg-primary">Principal</span> }
+                                                                    else { <span class="text-muted">—</span> }
+                                                                </td>
+                                                                <td>
+                                                                    @pp.FechaDesde.ToString("yyyy-MM-dd")
+                                                                    @if (pp.FechaHasta.HasValue)
+                                                                    {
+                                                                        @: &rarr; @pp.FechaHasta.Value.ToString("yyyy-MM-dd")
+                                                                    }
+                                                                </td>
+                                                                <td>
+                                                                    <a class="btn btn-sm btn-outline-secondary"
+                                                                       asp-page="/Proveedores/Vinculos/Edit"
+                                                                       asp-route-productoId="@pp.ProductoId"
+                                                                       asp-route-proveedorId="@pp.ProveedorId"
+                                                                       asp-route-fechaDesde="@pp.FechaDesde.ToString("yyyy-MM-ddTHH:mm:ss")">
+                                                                        Editar vínculo
+                                                                    </a>
+                                                                </td>
+
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="text-muted p-3">Este proveedor aún no tiene productos asociados.</div>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <p class="text-muted m-0">No hay resultados para la búsqueda.</p>
+        }
+    </div>
+</div>
+
+<!-- Modal: Vincular producto a proveedor -->
+<div class="modal fade" id="modalVincular" tabindex="-1" aria-labelledby="modalVincularLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="Add">
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalVincularLabel">Relacionar producto con proveedor</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="ProveedorId" id="ProveedorId" />
+                    <div class="mb-2">
+                        <label class="form-label">Proveedor</label>
+                        <input class="form-control" id="ProveedorNombre" disabled />
+                    </div>
+
+                    <div class="mb-2">
+                        <label for="ProductoId" class="form-label">Producto</label>
+                        <select class="form-select" id="ProductoId" name="ProductoId"
+                                asp-items="Model.ProductosSelect">
+                            <option value="">-- Seleccione un producto --</option>
+                        </select>
+                        <span class="text-danger">@Model.ErrorProducto</span>
+                    </div>
+
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <label for="SkuProveedor" class="form-label">SKU Proveedor</label>
+                            <input class="form-control" id="SkuProveedor" name="SkuProveedor" />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="PrecioCompra" class="form-label">Precio Compra</label>
+                            <input class="form-control" id="PrecioCompra" name="PrecioCompra" type="number" step="0.01" min="0" />
+                        </div>
+                    </div>
+
+                    <div class="row g-2 mt-2">
+                        <div class="col-md-6">
+                            <label for="PlazoEntregaDias" class="form-label">Plazo (días)</label>
+                            <input class="form-control" id="PlazoEntregaDias" name="PlazoEntregaDias" type="number" min="0" />
+                        </div>
+                        <div class="col-md-6 d-flex align-items-end">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="EsProveedorPrincipal" name="EsProveedorPrincipal" />
+                                <label class="form-check-label" for="EsProveedorPrincipal">Proveedor principal</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-2">
+                        <label for="FechaDesde" class="form-label">Fecha desde</label>
+                        <input class="form-control" id="FechaDesde" name="FechaDesde" type="date" value="@DateTime.UtcNow.ToString("yyyy-MM-dd")" />
+                 </div>
+
+                     <div class="mt-3 form-check">
+                            <input class="form-check-input" type="checkbox" id="VersionarPrecio" name="VersionarPrecio" />
+                            <label class="form-check-label" for="VersionarPrecio">
+                             Versionar precio (cerrar vínculo vigente y crear otro)
+                             </label>
+                        <div class="form-text">
+                        Si hay una relación vigente para este proveedor y producto, se cerrará con <em>FechaHasta = (Fecha desde − 1 segundo)</em> y se creará una nueva versión con los datos ingresados.
+                    </div>
+                </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancelar</button>
+                    <button class="btn btn-success" type="submit">Guardar vínculo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Cargar datos del proveedor en el modal
+        const modal = document.getElementById('modalVincular');
+        modal?.addEventListener('show.bs.modal', function (event) {
+            const btn = event.relatedTarget;
+            const provId = btn.getAttribute('data-prov-id');
+            const provNombre = btn.getAttribute('data-prov-nombre');
+            document.getElementById('ProveedorId').value = provId;
+            document.getElementById('ProveedorNombre').value = provNombre;
+        });
+    </script>
+}

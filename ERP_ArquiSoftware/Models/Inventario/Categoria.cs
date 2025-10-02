@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace ERP_ArquiSoftware.Models
+namespace ERP_ArquiSoftware.Models.Inventario
 {
     public class Categoria
     {

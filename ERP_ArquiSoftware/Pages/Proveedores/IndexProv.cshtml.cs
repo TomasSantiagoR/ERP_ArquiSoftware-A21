@@ -18,7 +18,6 @@ namespace ERP_ArquiSoftware.Pages.Proveedores
             Q = q?.Trim();
 
             var query = _context.Proveedores
-                .Include(p => p.Categoria)
                 .AsNoTracking()
                 .AsQueryable();
 
@@ -35,4 +34,3 @@ namespace ERP_ArquiSoftware.Pages.Proveedores
         }
     }
 }
-

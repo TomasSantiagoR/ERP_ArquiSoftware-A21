@@ -47,27 +47,18 @@
 
             <div class="row g-3 mb-2">
                 <div class="col-md-6">
-                    <label asp-for="Proveedor.CategoriaId" class="form-label"></label>
-                    <select asp-for="Proveedor.CategoriaId"
-                            class="form-select"
-                            asp-items="Model.CategoriasSelect">
-                        <option value="">-- Seleccione Categoría --</option>
-                    </select>
-                    <span asp-validation-for="Proveedor.CategoriaId" class="text-danger"></span>
-                </div>
-                <div class="col-md-6">
                     <label asp-for="Proveedor.CondicionesPago" class="form-label"></label>
                     <input asp-for="Proveedor.CondicionesPago" class="form-control" />
                     <span asp-validation-for="Proveedor.CondicionesPago" class="text-danger"></span>
                 </div>
-            </div>
-
-            <div class="row g-3 mb-4">
                 <div class="col-md-6">
                     <label asp-for="Proveedor.CuentaBancaria" class="form-label"></label>
                     <input asp-for="Proveedor.CuentaBancaria" class="form-control" />
                     <span asp-validation-for="Proveedor.CuentaBancaria" class="text-danger"></span>
                 </div>
+            </div>
+
+            <div class="row g-3 mb-4">
                 <div class="col-md-6">
                     <label asp-for="Proveedor.RepresentanteLegal" class="form-label"></label>
                     <input asp-for="Proveedor.RepresentanteLegal" class="form-control" />
@@ -106,4 +97,5 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
+
 

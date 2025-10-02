@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ERP_ArquiSoftware.Models
 {
@@ -26,15 +25,7 @@ namespace ERP_ArquiSoftware.Models
         [DisplayName("Correo Electrónico")]
         public string CorreoElectronico { get; set; } = string.Empty;
 
-
         // Datos Comerciales
-        [Required(ErrorMessage = "La categoría es obligatoria")]
-        [DisplayName("Categoría Productos/Servicios")]
-        public int CategoriaId { get; set; }
-
-        [DisplayName("Categoría")]
-        public Categoria? Categoria { get; set; }   // 🔗 Navegación a la misma tabla de categorías
-
         [DisplayName("Condiciones de Pago")]
         public string CondicionesPago { get; set; } = string.Empty;
 
@@ -43,7 +34,6 @@ namespace ERP_ArquiSoftware.Models
 
         [DisplayName("Representante Legal")]
         public string RepresentanteLegal { get; set; } = string.Empty;
-
 
         // Documentos y Estado
         [DisplayName("Documentos")]
@@ -54,5 +44,9 @@ namespace ERP_ArquiSoftware.Models
 
         [DisplayName("Fecha de Creación")]
         public DateTime FechaCreacion { get; set; } = DateTime.Now;
+
+        // N:N con Producto (join)
+        public ICollection<ProductoProveedor> ProductoProveedores { get; set; } = new List<ProductoProveedor>();
     }
 }
+
