@@ -1,13 +1,35 @@
-﻿using Microsoft.EntityFrameworkCore;
-using ERP_ArquiSoftware.Models;                 // Proveedor, Categoria (si siguen en este ns)
+﻿using ERP_ArquiSoftware.Models;                 // Proveedor, Categoria (si siguen en este ns)
 using ERP_ArquiSoftware.Models.Inventario;      // Producto, Marca, UnidadMedida, Impuesto, Almacen, Existencia
 using ERP_ArquiSoftware.Models.RRHH;            // Empleado, Departamento, Cargo, Contrato, TipoContrato
+using ERP_ArquiSoftware.Models.Ventas;          // Cliente, DireccionCliente, CondicionPago, PedidoVenta
+using ERP_ArquiSoftware.Models.Facturacion;   // FacturaVenta, Cobro, SecuenciaDocumento
+using Microsoft.EntityFrameworkCore;
 
 namespace ERP_ArquiSoftware.dA
 {
     public class AppDBContext : DbContext
     {
         public AppDBContext(DbContextOptions options) : base(options) { }
+
+        // Ventas
+        public DbSet<ERP_ArquiSoftware.Models.Ventas.Cliente> Clientes { get; set; }
+        public DbSet<ERP_ArquiSoftware.Models.Ventas.DireccionCliente> DireccionesCliente { get; set; }
+        public DbSet<ERP_ArquiSoftware.Models.Ventas.CondicionPago> CondicionesPago { get; set; }
+        public DbSet<ERP_ArquiSoftware.Models.Ventas.PedidoVenta> PedidosVenta { get; set; }
+        public DbSet<ERP_ArquiSoftware.Models.Ventas.PedidoVentaLinea> PedidoVentaLineas { get; set; }
+
+        // Facturación
+        public DbSet<ERP_ArquiSoftware.Models.Facturacion.FacturaVenta> FacturasVenta { get; set; }
+        public DbSet<ERP_ArquiSoftware.Models.Facturacion.FacturaVentaLinea> FacturaVentaLineas { get; set; }
+        public DbSet<ERP_ArquiSoftware.Models.Facturacion.Cobro> Cobros { get; set; }
+        public DbSet<ERP_ArquiSoftware.Models.Facturacion.SecuenciaDocumento> SecuenciasDocumento { get; set; }
+
+
+
+        // Inventario (kardex)
+        public DbSet<ERP_ArquiSoftware.Models.Inventario.MovimientoInventario> MovimientosInventario { get; set; }
+
+
 
         // --------- Inventario / Proveedores ---------
         public DbSet<Producto> Productos { get; set; }
@@ -31,6 +53,71 @@ namespace ERP_ArquiSoftware.dA
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            // ======================= PEDIDOS ========================
+            modelBuilder.Entity<PedidoVenta>()
+                .HasIndex(p => new { p.Serie, p.Numero })
+                .IsUnique();
+
+            modelBuilder.Entity<PedidoVentaLinea>()
+                .HasOne(l => l.Pedido)
+                .WithMany(p => p.Lineas)
+                .HasForeignKey(l => l.PedidoVentaId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            
+
+
+
+            // Cliente: documento único
+            modelBuilder.Entity<Cliente>()
+                .HasIndex(c => new { c.TipoDocumento, c.NumeroDocumento })
+                .IsUnique();
+
+            // Pedido/Factura: decimal ya configurado como decimal(18,2) en atributos.
+            // Factura: consecutivo único por Serie+Numero
+            modelBuilder.Entity<FacturaVenta>()
+                .HasIndex(f => new { f.Serie, f.Numero })
+                .IsUnique();
+
+            // MovimientoInventario: índices útiles
+            modelBuilder.Entity<MovimientoInventario>()
+                .HasIndex(m => new { m.AlmacenId, m.ProductoId, m.Fecha });
+
+            // Relación Factura (1) → (N) Líneas
+            modelBuilder.Entity<FacturaVentaLinea>()
+                .HasOne(l => l.Factura)
+                .WithMany(f => f.Lineas)
+                .HasForeignKey(l => l.FacturaVentaId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // (Opcional) si estás usando PedidoVentaLinea:
+            modelBuilder.Entity<PedidoVentaLinea>()
+                .HasOne(l => l.Pedido)
+                .WithMany(p => p.Lineas)
+                .HasForeignKey(l => l.PedidoVentaId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // presiciones // 
+
+            modelBuilder.Entity<FacturaVenta>()
+                .Property(f => f.Subtotal).HasColumnType("decimal(18,2)");
+            modelBuilder.Entity<FacturaVenta>()
+                .Property(f => f.TotalImpuestos).HasColumnType("decimal(18,2)");
+            modelBuilder.Entity<FacturaVenta>()
+                .Property(f => f.Total).HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<FacturaVentaLinea>()
+                .Property(l => l.PrecioUnitario).HasColumnType("decimal(18,2)");
+            modelBuilder.Entity<FacturaVentaLinea>()
+                .Property(l => l.ImpuestoPorcentaje).HasColumnType("decimal(5,2)");
+            modelBuilder.Entity<FacturaVentaLinea>()
+                .Property(l => l.ImporteNeto).HasColumnType("decimal(18,2)");
+            modelBuilder.Entity<FacturaVentaLinea>()
+                .Property(l => l.ImporteImpuesto).HasColumnType("decimal(18,2)");
+            modelBuilder.Entity<FacturaVentaLinea>()
+                .Property(l => l.ImporteTotal).HasColumnType("decimal(18,2)");
+
 
             // ===================== INVENTARIO =====================
 
@@ -132,7 +219,7 @@ namespace ERP_ArquiSoftware.dA
             // Empleado -> Almacén (N:1)
             modelBuilder.Entity<Empleado>()
                 .HasOne(e => e.Almacen)
-                .WithMany(a => a.Empleados)           // si tu modelo Almacen no tiene Empleados, usa .WithMany()
+                .WithMany(a => a.Empleados)          
                 .HasForeignKey(e => e.AlmacenId)
                 .OnDelete(DeleteBehavior.Restrict);
 

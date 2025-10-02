@@ -1,0 +1,57 @@
+﻿@page
+@model ERP_ArquiSoftware.Pages.Facturacion.Facturas.IndexModel
+@{
+    ViewData["Title"] = "Facturas de Venta";
+}
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <h3 class="m-0">@ViewData["Title"]</h3>
+    <a asp-page="Create" class="btn btn-primary">Nueva Factura</a>
+</div>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-sm-6 col-md-5">
+        <input name="q" value="@Model.Q" class="form-control" placeholder="Buscar por cliente, serie, número..." />
+    </div>
+    <div class="col-auto"><button class="btn btn-outline-secondary">Buscar</button></div>
+</form>
+
+<div class="card">
+    <div class="table-responsive table-scroll">
+        <table class="table table-striped table-hover align-middle m-0 table-sticky">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Factura</th>
+                    <th>Cliente</th>
+                    <th>Almacén</th>
+                    <th class="text-end">Total</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Items.Any())
+                {
+                    foreach (var f in Model.Items)
+                    {
+                        <tr>
+                            <td>@f.Fecha.ToString("yyyy-MM-dd HH:mm")</td>
+                            <td>@($"{f.Serie}-{f.Numero}")</td>
+                            <td>@f.Cliente</td>
+                            <td>@f.Almacen</td>
+                            <td class="text-end">@f.Total.ToString("C")</td>
+                            <td>@f.Estado</td>
+                            <td>
+                                <a asp-page="Details" asp-route-id="@f.Id">@($"{f.Serie}-{f.Numero}")</a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="6" class="text-center py-4 text-muted">Sin facturas.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+

@@ -15,9 +15,4 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Pages\Facturacion\" />
-    <Folder Include="Pages\Ventas\" />
-  </ItemGroup>
-
 </Project>
