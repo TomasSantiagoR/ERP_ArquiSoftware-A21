@@ -1,0 +1,109 @@
+﻿@page
+@model ERP_ArquiSoftware.Pages.RRHH.Empleados.CreateModel
+@{
+    ViewData["Title"] = "Nuevo Empleado";
+}
+
+<div class="card shadow">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h3 class="m-0">@ViewData["Title"]</h3>
+        <a asp-page="Index" class="btn btn-outline-secondary">Volver</a>
+    </div>
+
+    <div class="card-body">
+        <form method="post">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="row g-3">
+                <div class="col-12 col-lg-6">
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <label asp-for="Empleado.Nombres" class="form-label"></label>
+                            <input asp-for="Empleado.Nombres" class="form-control" />
+                            <span asp-validation-for="Empleado.Nombres" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Empleado.Apellidos" class="form-label"></label>
+                            <input asp-for="Empleado.Apellidos" class="form-control" />
+                            <span asp-validation-for="Empleado.Apellidos" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <label asp-for="Empleado.Documento" class="form-label"></label>
+                            <input asp-for="Empleado.Documento" class="form-control" />
+                            <span asp-validation-for="Empleado.Documento" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Empleado.FechaNacimiento" class="form-label"></label>
+                            <input asp-for="Empleado.FechaNacimiento" class="form-control" type="date" />
+                            <span asp-validation-for="Empleado.FechaNacimiento" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row g-2">
+                        <div class="col-md-7">
+                            <label asp-for="Empleado.Correo" class="form-label"></label>
+                            <input asp-for="Empleado.Correo" class="form-control" />
+                            <span asp-validation-for="Empleado.Correo" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-5">
+                            <label asp-for="Empleado.Telefono" class="form-label"></label>
+                            <input asp-for="Empleado.Telefono" class="form-control" />
+                            <span asp-validation-for="Empleado.Telefono" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-check mt-2">
+                        <input asp-for="Empleado.Activo" class="form-check-input" />
+                        <label asp-for="Empleado.Activo" class="form-check-label"></label>
+                    </div>
+                </div>
+
+                <div class="col-12 col-lg-6">
+                    <div class="mb-2">
+                        <label asp-for="Empleado.AlmacenId" class="form-label">Almacén</label>
+                        <select asp-for="Empleado.AlmacenId" class="form-select" asp-items="Model.AlmacenesSelect">
+                            <option value="">-- Seleccione Almacén --</option>
+                        </select>
+                        <span asp-validation-for="Empleado.AlmacenId" class="text-danger"></span>
+                    </div>
+
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <label asp-for="Empleado.DepartamentoId" class="form-label">Departamento</label>
+                            <select asp-for="Empleado.DepartamentoId" class="form-select" asp-items="Model.DepartamentosSelect">
+                                <option value="">-- Seleccione Departamento --</option>
+                            </select>
+                            <span asp-validation-for="Empleado.DepartamentoId" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Empleado.CargoId" class="form-label">Cargo</label>
+                            <select asp-for="Empleado.CargoId" class="form-select" asp-items="Model.CargosSelect">
+                                <option value="">-- Seleccione Cargo --</option>
+                            </select>
+                            <span asp-validation-for="Empleado.CargoId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="mt-2">
+                        <label asp-for="Empleado.FechaIngreso" class="form-label">Fecha de Ingreso</label>
+                        <input asp-for="Empleado.FechaIngreso" class="form-control" type="date" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 mt-4">
+                <button class="btn btn-primary" type="submit">Guardar</button>
+                <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}
+

@@ -61,6 +61,32 @@ body {
 
 
 
+/* Scroll vertical para tablas dentro de un contenedor */
+.table-scroll {
+    max-height: 65vh; /* ajusta a gusto: 50vh, 70vh, 500px, etc. */
+    overflow-y: auto;
+    overflow-x: auto; /* mantiene el scroll horizontal si hace falta */
+}
+
+    /* Quita el espacio extra al final cuando hay scroll */
+    .table-scroll table {
+        margin-bottom: 0;
+    }
+
+/* Encabezado pegajoso  */
+.table-sticky thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--bs-body-bg, #fff); /* compatible con Bootstrap */
+    /* opcional: sombrita sutil */
+    box-shadow: 0 1px 0 rgba(0,0,0,.06);
+}
+
+
+
+
+
 
 
 

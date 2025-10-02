@@ -38,6 +38,7 @@
                     <td class="text-end">
                         <a asp-page="Upsert" asp-route-id="@a.Id" class="btn btn-sm btn-primary">Editar</a>
                         <a asp-page="Inventario" asp-route-id="@a.Id" class="btn btn-sm btn-outline-secondary">Ver inventario</a>
+                        <a asp-page="Empleados" asp-route-id="@a.Id" class="btn btn-sm btn-outline-info">Ver empleados</a>
                         <form method="post" asp-page-handler="Delete" asp-route-id="@a.Id" class="d-inline"
                               onsubmit="return confirm('¿Eliminar almacén?')">
                             <button class="btn btn-sm btn-danger">Borrar</button>

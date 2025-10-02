@@ -1,0 +1,81 @@
+﻿@page "{id:int}"
+@model ERP_ArquiSoftware.Pages.Maestros.Almacenes.EmpleadosModel
+@using ERP_ArquiSoftware.Models.RRHH
+@{
+    ViewData["Title"] = "Empleados del almacén";
+}
+
+<a asp-page="/Maestros/Almacenes/Index" class="btn btn-outline-secondary mb-2">Volver a Almacenes</a>
+
+<div class="card shadow mt-2">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <div>
+            <h3 class="m-0">@Model.Almacen?.Nombre</h3>
+            <small class="text-muted">@Model.Almacen?.Direccion</small>
+        </div>
+        <div class="text-end">
+            <span class="badge bg-primary me-2">Total: @Model.TotalEmpleados</span>
+            <span class="badge bg-success me-2">Activos: @Model.Activos</span>
+            <span class="badge bg-secondary">Inactivos: @Model.Inactivos</span>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <form method="get" class="row g-2 mb-3">
+            <input type="hidden" name="id" value="@Model.AlmacenId" />
+            <div class="col-sm-6 col-md-5">
+                <input name="q" value="@Model.Q" class="form-control"
+                       placeholder="Buscar por nombre, documento, correo, cargo o departamento..." />
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-outline-secondary" type="submit">Buscar</button>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle m-0">
+                <thead>
+                    <tr>
+                        <th>Documento</th>
+                        <th>Nombre</th>
+                        <th>Correo</th>
+                        <th>Teléfono</th>
+                        <th>Departamento</th>
+                        <th>Cargo</th>
+                        <th>Estado</th>
+                        <th>Ingreso</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (Model.Items.Any())
+                {
+                    foreach (var e in Model.Items)
+                    {
+                        <tr>
+                            <td>@e.Documento</td>
+                            <td>@($"{e.Nombres} {e.Apellidos}")</td>
+                            <td>@e.Correo</td>
+                            <td>@e.Telefono</td>
+                            <td>@(e.Departamento?.Nombre ?? "—")</td>
+                            <td>@(e.Cargo?.Nombre ?? "—")</td>
+                            <td>
+                                @if (e.Activo) { <span class="badge bg-success">Activo</span> }
+                                else { <span class="badge bg-secondary">Inactivo</span> }
+                            </td>
+                            <td>@e.FechaIngreso.ToString("yyyy-MM-dd")</td>
+                            <td class="text-end">
+                                <a asp-page="/RRHH/Empleados/Edit" asp-route-id="@e.Id" class="btn btn-sm btn-primary">Editar</a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="9" class="text-center py-4 text-muted">Sin empleados en este almacén.</td></tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
