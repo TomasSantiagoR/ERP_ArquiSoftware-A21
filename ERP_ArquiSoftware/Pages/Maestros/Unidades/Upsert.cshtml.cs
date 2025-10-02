@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using ERP_ArquiSoftware.dA;
 using ERP_ArquiSoftware.Models;
+using ERP_ArquiSoftware.Models.Inventario;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 

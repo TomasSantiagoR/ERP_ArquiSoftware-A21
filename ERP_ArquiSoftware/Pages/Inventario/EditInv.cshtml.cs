@@ -84,19 +84,7 @@ namespace ERP_ArquiSoftware.Pages.Inventario
 
             // Flags y atributos físicos
             original.Activo = Productos.Activo;
-            original.Perecedero = Productos.Perecedero;
-            original.GestionaLotes = Productos.GestionaLotes;
-            original.GestionaSeries = Productos.GestionaSeries;
-            original.VidaUtilDias = Productos.VidaUtilDias;
-
-            original.PesoNetoKg = Productos.PesoNetoKg;
-            original.PesoBrutoKg = Productos.PesoBrutoKg;
-            original.AltoCm = Productos.AltoCm;
-            original.AnchoCm = Productos.AnchoCm;
-            original.LargoCm = Productos.LargoCm;
-
-            original.ContenidoPorUnidad = Productos.ContenidoPorUnidad;
-            original.UnidadContenidoId = Productos.UnidadContenidoId;
+            
 
             try
             {

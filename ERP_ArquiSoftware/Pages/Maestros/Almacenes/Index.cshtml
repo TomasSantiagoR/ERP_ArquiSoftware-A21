@@ -18,15 +18,26 @@
 <div class="card">
     <div class="table-responsive">
         <table class="table table-striped table-hover align-middle m-0">
-            <thead><tr><th>ID</th><th>Nombre</th><th>Dirección</th><th>Estado</th><th></th></tr></thead>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Dirección</th>
+                    <th>Estado</th>
+                    <th></th>
+                </tr>
+            </thead>
             <tbody>
             @foreach (var a in Model.Items)
             {
                 <tr>
-                    <td>@a.Id</td><td>@a.Nombre</td><td>@a.Direccion</td>
+                    <td>@a.Id</td>
+                    <td>@a.Nombre</td>
+                    <td>@a.Direccion</td>
                     <td>@(a.Activo ? "Activo" : "Inactivo")</td>
                     <td class="text-end">
                         <a asp-page="Upsert" asp-route-id="@a.Id" class="btn btn-sm btn-primary">Editar</a>
+                        <a asp-page="Inventario" asp-route-id="@a.Id" class="btn btn-sm btn-outline-secondary">Ver inventario</a>
                         <form method="post" asp-page-handler="Delete" asp-route-id="@a.Id" class="d-inline"
                               onsubmit="return confirm('¿Eliminar almacén?')">
                             <button class="btn btn-sm btn-danger">Borrar</button>
@@ -38,3 +49,7 @@
         </table>
     </div>
 </div>
+
+
+
+

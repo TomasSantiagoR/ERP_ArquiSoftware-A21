@@ -54,21 +54,12 @@ namespace ERP_ArquiSoftware.dA
                 .HasForeignKey(p => p.ImpuestoId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Producto -> UnidadContenido (N:1, opcional)
-            modelBuilder.Entity<Producto>()
-                .HasOne(p => p.UnidadContenido)
-                .WithMany()
-                .HasForeignKey(p => p.UnidadContenidoId)
-                .OnDelete(DeleteBehavior.Restrict);
-
             // ---------- Proveedor ----------
-            // Proveedor: NIT único
             modelBuilder.Entity<Proveedor>()
                 .HasIndex(p => p.NIT)
                 .IsUnique();
 
             // ---------- Producto <-> Proveedor (N:N con histórico) ----------
-            // Clave compuesta incluye FechaDesde para permitir versiones en el tiempo
             modelBuilder.Entity<ProductoProveedor>()
                 .HasKey(pp => new { pp.ProductoId, pp.ProveedorId, pp.FechaDesde });
 
@@ -84,18 +75,11 @@ namespace ERP_ArquiSoftware.dA
                 .HasForeignKey(pp => pp.ProveedorId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Índices útiles en la relación
             modelBuilder.Entity<ProductoProveedor>()
                 .HasIndex(pp => new { pp.ProductoId, pp.EsProveedorPrincipal });
 
             modelBuilder.Entity<ProductoProveedor>()
                 .HasIndex(pp => pp.SkuProveedor);
-
-            // (Opcional, SQL Server) Solo 1 principal por producto
-            // modelBuilder.Entity<ProductoProveedor>()
-            //   .HasIndex(pp => pp.ProductoId)
-            //   .IsUnique()
-            //   .HasFilter("[EsProveedorPrincipal] = 1");
 
             // ---------- Producto (índices/constraints) ----------
             modelBuilder.Entity<Producto>()
@@ -106,7 +90,7 @@ namespace ERP_ArquiSoftware.dA
                 .IsUnique();
 
             modelBuilder.Entity<Producto>()
-                .HasIndex(p => p.Gtin); // puede ser nulo; índice ayuda en búsquedas
+                .HasIndex(p => p.Gtin);
 
             // ---------- Stock por Almacén ----------
             modelBuilder.Entity<Existencia>()
@@ -124,37 +108,26 @@ namespace ERP_ArquiSoftware.dA
                 .HasForeignKey(e => e.AlmacenId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // ---------- Precisión decimal (por si cambias de provider) ----------
+            // ---------- Precisión decimal ----------
             modelBuilder.Entity<Producto>()
                 .Property(p => p.PrecioUnitario)
                 .HasColumnType("decimal(18,2)");
 
             modelBuilder.Entity<Producto>()
                 .Property(p => p.CostoEstandar).HasColumnType("decimal(18,2)");
-            modelBuilder.Entity<Producto>()
-                .Property(p => p.CostoPromedio).HasColumnType("decimal(18,2)");
-            modelBuilder.Entity<Producto>()
-                .Property(p => p.UltimoCosto).HasColumnType("decimal(18,2)");
 
             modelBuilder.Entity<Producto>()
-                .Property(p => p.PesoNetoKg).HasColumnType("decimal(18,3)");
+                .Property(p => p.CostoPromedio).HasColumnType("decimal(18,2)");
+
             modelBuilder.Entity<Producto>()
-                .Property(p => p.PesoBrutoKg).HasColumnType("decimal(18,3)");
-            modelBuilder.Entity<Producto>()
-                .Property(p => p.AltoCm).HasColumnType("decimal(18,2)");
-            modelBuilder.Entity<Producto>()
-                .Property(p => p.AnchoCm).HasColumnType("decimal(18,2)");
-            modelBuilder.Entity<Producto>()
-                .Property(p => p.LargoCm).HasColumnType("decimal(18,2)");
+                .Property(p => p.UltimoCosto).HasColumnType("decimal(18,2)");
 
             modelBuilder.Entity<ProductoProveedor>()
                 .Property(pp => pp.PrecioCompra).HasColumnType("decimal(18,2)");
 
-            // Impuesto porcentaje como decimal(5,2) si lo prefieres así
             modelBuilder.Entity<Impuesto>()
                 .Property(i => i.Porcentaje)
                 .HasColumnType("decimal(5,2)");
         }
     }
 }
-

@@ -1,0 +1,88 @@
+﻿@page "{id:int}"
+@model ERP_ArquiSoftware.Pages.Maestros.Almacenes.InventarioModel
+@{
+    ViewData["Title"] = $"Inventario - {Model.Almacen?.Nombre ?? "Almacén"}";
+}
+
+<a asp-page="/Maestros/Almacenes/Index" class="btn btn-outline-secondary mb-2">Volver a Almacenes</a>
+
+<div class="card shadow">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <div>
+            <h3 class="m-0">@ViewData["Title"]</h3>
+            <small class="text-muted">
+                @Model.Almacen?.Direccion
+            </small>
+        </div>
+        <div class="text-end">
+            <div><strong>SKUs:</strong> @Model.TotalSkus</div>
+            <div><strong>Unidades totales:</strong> @Model.TotalUnidades</div>
+            <div><strong>Valorización costo:</strong> @Model.TotalValorCosto.ToString("C")</div>
+            <div><strong>Valorización PVP:</strong> @Model.TotalValorPvp.ToString("C")</div>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <form method="get" class="row g-2 mb-3">
+            <input type="hidden" name="id" value="@Model.AlmacenId" />
+            <div class="col-sm-6 col-md-5">
+                <input name="q" value="@Model.Q" class="form-control" placeholder="Buscar por SKU, producto o categoría..." />
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-outline-secondary" type="submit">Buscar</button>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead>
+                <tr>
+                    <th>SKU</th>
+                    <th>Producto</th>
+                    <th>Categoría</th>
+                    <th class="text-end">Stock almacén</th>
+                    <th class="text-end">Stock mín.</th>
+                    <th class="text-end">Pto. reorden</th>
+                    <th class="text-end">Costo</th>
+                    <th class="text-end">PVP</th>
+                    <th>Estado</th>
+                </tr>
+                </thead>
+                <tbody>
+                @if (Model.Items.Any())
+                {
+                    foreach (var r in Model.Items)
+                    {
+                        var bajo = (r.Stock < r.StockMin) || (r.PuntoReorden.HasValue && r.Stock <= r.PuntoReorden.Value);
+                        <tr class="@(bajo ? "table-warning" : "")">
+                            <td>@r.Sku</td>
+                            <td>@r.Nombre</td>
+                            <td>@r.Categoria</td>
+                            <td class="text-end">@r.Stock</td>
+                            <td class="text-end">@r.StockMin</td>
+                            <td class="text-end">@((r.PuntoReorden?.ToString()) ?? "—")</td>
+                            <td class="text-end">@((r.Costo ?? 0m).ToString("C"))</td>
+                            <td class="text-end">@r.Precio.ToString("C")</td>
+                            <td>
+                                @if (bajo) { <span class="badge bg-danger">Bajo</span> }
+                                else { <span class="badge bg-success">OK</span> }
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="9" class="text-center py-4 text-muted">
+                            Este almacén no tiene existencias que coincidan con el filtro.
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+

@@ -4,6 +4,7 @@ using ERP_ArquiSoftware.dA;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ERP_ArquiSoftware.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    partial class AppDBContextModelSnapshot : ModelSnapshot
+    [Migration("20251002002749_NuevosModelosRRHH")]
+    partial class NuevosModelosRRHH
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -145,11 +148,24 @@ namespace ERP_ArquiSoftware.Migrations
                     b.Property<bool>("Activo")
                         .HasColumnType("bit");
 
+                    b.Property<decimal?>("AltoCm")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("AnchoCm")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<int?>("CantidadReorden")
                         .HasColumnType("int");
 
                     b.Property<int>("CategoriaId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Color")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<decimal?>("ContenidoPorUnidad")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("CostoEstandar")
                         .HasColumnType("decimal(18,2)");
@@ -157,12 +173,24 @@ namespace ERP_ArquiSoftware.Migrations
                     b.Property<decimal?>("CostoPromedio")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<bool>("Descontinuado")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Descripcion")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("EsPublicableWeb")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("GestionaLotes")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("GestionaSeries")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Gtin")
                         .HasMaxLength(20)
@@ -170,6 +198,9 @@ namespace ERP_ArquiSoftware.Migrations
 
                     b.Property<int?>("ImpuestoId")
                         .HasColumnType("int");
+
+                    b.Property<decimal?>("LargoCm")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int?>("MarcaId")
                         .HasColumnType("int");
@@ -179,11 +210,28 @@ namespace ERP_ArquiSoftware.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<bool>("Perecedero")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal?>("PesoBrutoKg")
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<decimal?>("PesoNetoKg")
+                        .HasColumnType("decimal(18,3)");
+
                     b.Property<decimal>("PrecioUnitario")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int?>("PuntoReorden")
                         .HasColumnType("int");
+
+                    b.Property<string>("RazonDescontinuacion")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<decimal>("Salario")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Sku")
                         .IsRequired()
@@ -196,10 +244,20 @@ namespace ERP_ArquiSoftware.Migrations
                     b.Property<int>("StockMin")
                         .HasColumnType("int");
 
+                    b.Property<string>("Talla")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
                     b.Property<decimal?>("UltimoCosto")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int?>("UnidadContenidoId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("UnidadMedidaId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("VidaUtilDias")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -216,6 +274,8 @@ namespace ERP_ArquiSoftware.Migrations
 
                     b.HasIndex("Sku")
                         .IsUnique();
+
+                    b.HasIndex("UnidadContenidoId");
 
                     b.HasIndex("UnidadMedidaId");
 
@@ -536,6 +596,11 @@ namespace ERP_ArquiSoftware.Migrations
                         .HasForeignKey("MarcaId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("ERP_ArquiSoftware.Models.Inventario.UnidadMedida", "UnidadContenido")
+                        .WithMany()
+                        .HasForeignKey("UnidadContenidoId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("ERP_ArquiSoftware.Models.Inventario.UnidadMedida", "UnidadMedida")
                         .WithMany()
                         .HasForeignKey("UnidadMedidaId")
@@ -546,6 +611,8 @@ namespace ERP_ArquiSoftware.Migrations
                     b.Navigation("Impuesto");
 
                     b.Navigation("Marca");
+
+                    b.Navigation("UnidadContenido");
 
                     b.Navigation("UnidadMedida");
                 });
