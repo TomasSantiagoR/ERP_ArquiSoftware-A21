@@ -1,0 +1,61 @@
+﻿@page "{clienteId:int}/{id:int?}"
+@model ERP_ArquiSoftware.Pages.Ventas.Clientes.UpsertDireccionModel
+@{
+    ViewData["Title"] = Model.Input.Id == 0 ? "Nueva Dirección" : "Editar Dirección";
+}
+<div class="card shadow">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h3 class="m-0">@ViewData["Title"]</h3>
+        <a asp-page="Direcciones" asp-route-clienteId="@Model.ClienteId" class="btn btn-outline-secondary">Volver</a>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+            <input type="hidden" asp-for="Input.Id" />
+            <input type="hidden" asp-for="ClienteId" />
+
+            <div class="row g-2">
+                <div class="col-md-4">
+                    <label asp-for="Input.Tipo" class="form-label"></label>
+                    <select asp-for="Input.Tipo" class="form-select">
+                        <option>Entrega</option>
+                        <option>Facturacion</option>
+                    </select>
+                </div>
+                <div class="col-md-8">
+                    <label asp-for="Input.Direccion" class="form-label"></label>
+                    <input asp-for="Input.Direccion" class="form-control" />
+                    <span asp-validation-for="Input.Direccion" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row g-2 mt-1">
+                <div class="col-md-4">
+                    <label asp-for="Input.Ciudad" class="form-label"></label>
+                    <input asp-for="Input.Ciudad" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="Input.Departamento" class="form-label"></label>
+                    <input asp-for="Input.Departamento" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="Input.CodigoPostal" class="form-label"></label>
+                    <input asp-for="Input.CodigoPostal" class="form-control" />
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 mt-3">
+                <button class="btn btn-primary" type="submit">Guardar</button>
+                <a asp-page="Direcciones" asp-route-clienteId="@Model.ClienteId" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+}

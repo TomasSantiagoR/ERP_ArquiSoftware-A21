@@ -4,6 +4,7 @@ using ERP_ArquiSoftware.dA;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ERP_ArquiSoftware.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    partial class AppDBContextModelSnapshot : ModelSnapshot
+    [Migration("20251002161919_ModelosVentasFac")]
+    partial class ModelosVentasFac
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -139,50 +142,6 @@ namespace ERP_ArquiSoftware.Migrations
                         .IsUnique();
 
                     b.ToTable("FacturasVenta");
-                });
-
-            modelBuilder.Entity("ERP_ArquiSoftware.Models.Facturacion.FacturaVentaLinea", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Cantidad")
-                        .HasColumnType("int");
-
-                    b.Property<int>("FacturaVentaId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("ImporteImpuesto")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("ImporteNeto")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("ImporteTotal")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int?>("ImpuestoId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal?>("ImpuestoPorcentaje")
-                        .HasColumnType("decimal(5,2)");
-
-                    b.Property<decimal>("PrecioUnitario")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("ProductoId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FacturaVentaId");
-
-                    b.HasIndex("ProductoId");
-
-                    b.ToTable("FacturaVentaLineas");
                 });
 
             modelBuilder.Entity("ERP_ArquiSoftware.Models.Facturacion.SecuenciaDocumento", b =>
@@ -846,14 +805,6 @@ namespace ERP_ArquiSoftware.Migrations
                     b.Property<DateTime>("Fecha")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Numero")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Serie")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
                     b.Property<decimal>("Subtotal")
                         .HasColumnType("decimal(18,2)");
 
@@ -871,54 +822,7 @@ namespace ERP_ArquiSoftware.Migrations
 
                     b.HasIndex("CondicionPagoId");
 
-                    b.HasIndex("Serie", "Numero")
-                        .IsUnique();
-
                     b.ToTable("PedidosVenta");
-                });
-
-            modelBuilder.Entity("ERP_ArquiSoftware.Models.Ventas.PedidoVentaLinea", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Cantidad")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("ImporteImpuesto")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("ImporteNeto")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("ImporteTotal")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int?>("ImpuestoId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal?>("ImpuestoPorcentaje")
-                        .HasColumnType("decimal(5,2)");
-
-                    b.Property<int>("PedidoVentaId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("PrecioUnitario")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("ProductoId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PedidoVentaId");
-
-                    b.HasIndex("ProductoId");
-
-                    b.ToTable("PedidoVentaLineas");
                 });
 
             modelBuilder.Entity("ERP_ArquiSoftware.Models.Facturacion.Cobro", b =>
@@ -961,25 +865,6 @@ namespace ERP_ArquiSoftware.Migrations
                     b.Navigation("CondicionPago");
 
                     b.Navigation("Pedido");
-                });
-
-            modelBuilder.Entity("ERP_ArquiSoftware.Models.Facturacion.FacturaVentaLinea", b =>
-                {
-                    b.HasOne("ERP_ArquiSoftware.Models.Facturacion.FacturaVenta", "Factura")
-                        .WithMany("Lineas")
-                        .HasForeignKey("FacturaVentaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ERP_ArquiSoftware.Models.Inventario.Producto", "Producto")
-                        .WithMany()
-                        .HasForeignKey("ProductoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Factura");
-
-                    b.Navigation("Producto");
                 });
 
             modelBuilder.Entity("ERP_ArquiSoftware.Models.Inventario.Existencia", b =>
@@ -1162,25 +1047,6 @@ namespace ERP_ArquiSoftware.Migrations
                     b.Navigation("CondicionPago");
                 });
 
-            modelBuilder.Entity("ERP_ArquiSoftware.Models.Ventas.PedidoVentaLinea", b =>
-                {
-                    b.HasOne("ERP_ArquiSoftware.Models.Ventas.PedidoVenta", "Pedido")
-                        .WithMany("Lineas")
-                        .HasForeignKey("PedidoVentaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ERP_ArquiSoftware.Models.Inventario.Producto", "Producto")
-                        .WithMany()
-                        .HasForeignKey("ProductoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Pedido");
-
-                    b.Navigation("Producto");
-                });
-
             modelBuilder.Entity("ERP_ArquiSoftware.Models.Almacen", b =>
                 {
                     b.Navigation("Empleados");
@@ -1191,8 +1057,6 @@ namespace ERP_ArquiSoftware.Migrations
             modelBuilder.Entity("ERP_ArquiSoftware.Models.Facturacion.FacturaVenta", b =>
                 {
                     b.Navigation("Cobros");
-
-                    b.Navigation("Lineas");
                 });
 
             modelBuilder.Entity("ERP_ArquiSoftware.Models.Inventario.Categoria", b =>
@@ -1253,11 +1117,6 @@ namespace ERP_ArquiSoftware.Migrations
                     b.Navigation("Facturas");
 
                     b.Navigation("Pedidos");
-                });
-
-            modelBuilder.Entity("ERP_ArquiSoftware.Models.Ventas.PedidoVenta", b =>
-                {
-                    b.Navigation("Lineas");
                 });
 #pragma warning restore 612, 618
         }

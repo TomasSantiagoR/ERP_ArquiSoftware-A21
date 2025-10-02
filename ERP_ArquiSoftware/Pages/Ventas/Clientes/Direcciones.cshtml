@@ -1,0 +1,73 @@
+﻿@page "{clienteId:int}"
+@model ERP_ArquiSoftware.Pages.Ventas.Clientes.DireccionesModel
+@{
+    ViewData["Title"] = "Direcciones del cliente";
+}
+<a asp-page="/Ventas/Clientes/Index" class="btn btn-outline-secondary mb-2">Volver a Clientes</a>
+
+<div class="card shadow mt-2">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <div>
+            <h3 class="m-0">@Model.Cliente?.NombreRazonSocial</h3>
+            <small class="text-muted">@Model.Cliente?.TipoDocumento @Model.Cliente?.NumeroDocumento</small>
+        </div>
+        <a asp-page="UpsertDireccion" asp-route-clienteId="@Model.ClienteId" class="btn btn-primary">
+            Nueva Dirección
+        </a>
+    </div>
+
+    <div class="card-body">
+        <form method="get" class="row g-2 mb-3">
+            <input type="hidden" name="clienteId" value="@Model.ClienteId" />
+            <div class="col-sm-6 col-md-5">
+                <input name="q" value="@Model.Q" class="form-control" placeholder="Buscar por dirección, ciudad, departamento..." />
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-outline-secondary">Buscar</button>
+            </div>
+        </form>
+
+        <div class="table-responsive table-scroll">
+            <table class="table table-striped table-hover align-middle m-0 table-sticky">
+                <thead>
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Dirección</th>
+                        <th>Ciudad</th>
+                        <th>Departamento</th>
+                        <th>Código Postal</th>
+                        <th style="width:140px;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Items.Any())
+                    {
+                        foreach (var d in Model.Items)
+                        {
+                            <tr>
+                                <td>@d.Tipo</td>
+                                <td>@d.Direccion</td>
+                                <td>@(d.Ciudad ?? "—")</td>
+                                <td>@(d.Departamento ?? "—")</td>
+                                <td>@(d.CodigoPostal ?? "—")</td>
+                                <td class="text-end">
+                                    <a asp-page="UpsertDireccion" asp-route-clienteId="@Model.ClienteId" asp-route-id="@d.Id"
+                                       class="btn btn-sm btn-primary">Editar</a>
+                                    <form method="post" asp-page-handler="Delete" asp-route-id="@d.Id" asp-route-clienteId="@Model.ClienteId"
+                                          class="d-inline" onsubmit="return confirm('¿Eliminar dirección?')">
+                                        <button class="btn btn-sm btn-danger">Borrar</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="6" class="text-center py-4 text-muted">Sin direcciones.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+

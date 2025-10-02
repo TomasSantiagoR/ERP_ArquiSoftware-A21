@@ -5,7 +5,7 @@ namespace ERP_ArquiSoftware.Models
 {
     public class ProductoProveedor
     {
-        // Clave compuesta (ver OnModelCreating)
+        // Clave compuesta 
         public int ProductoId { get; set; }
         public int ProveedorId { get; set; }
 
@@ -18,10 +18,10 @@ namespace ERP_ArquiSoftware.Models
         // Plazo de entrega estimado en días
         public int? PlazoEntregaDias { get; set; }
 
-        // Marca si este proveedor es el principal para este producto
+        
         public bool EsProveedorPrincipal { get; set; } = false;
 
-        // Vigencia (útil si llevas histórico de precios/proveedores)
+        // Vigencia 
         public DateTime FechaDesde { get; set; } = DateTime.UtcNow;
         public DateTime? FechaHasta { get; set; }
 

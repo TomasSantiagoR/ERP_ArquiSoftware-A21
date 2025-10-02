@@ -1,0 +1,44 @@
+﻿@page "{id:int?}"
+@model ERP_ArquiSoftware.Pages.Ventas.CondicionesPago.UpsertModel
+@{
+    ViewData["Title"] = Model.Input.Id == 0 ? "Nueva Condición de Pago" : "Editar Condición de Pago";
+}
+<div class="card shadow">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h3 class="m-0">@ViewData["Title"]</h3>
+        <a asp-page="Index" class="btn btn-outline-secondary">Volver</a>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+            <input type="hidden" asp-for="Input.Id" />
+
+            <div class="row g-2">
+                <div class="col-md-8">
+                    <label asp-for="Input.Nombre" class="form-label"></label>
+                    <input asp-for="Input.Nombre" class="form-control" />
+                    <span asp-validation-for="Input.Nombre" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="Input.DiasPlazo" class="form-label"></label>
+                    <input asp-for="Input.DiasPlazo" type="number" min="0" class="form-control" />
+                    <span asp-validation-for="Input.DiasPlazo" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 mt-3">
+                <button class="btn btn-primary" type="submit">Guardar</button>
+                <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+}
+

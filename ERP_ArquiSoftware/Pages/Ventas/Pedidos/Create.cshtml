@@ -1,0 +1,169 @@
+﻿@page
+@model ERP_ArquiSoftware.Pages.Ventas.Pedidos.CreateModel
+@{
+    ViewData["Title"] = "Nuevo Pedido de Venta";
+}
+<div class="card shadow">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h3 class="m-0">@ViewData["Title"]</h3>
+        <a asp-page="Index" class="btn btn-outline-secondary">Volver</a>
+    </div>
+    <div class="card-body">
+        <form method="post" id="form-pedido">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+
+            <div class="row g-2">
+                <div class="col-md-2">
+                    <label asp-for="Input.Serie" class="form-label"></label>
+                    <input asp-for="Input.Serie" class="form-control" />
+                    <span asp-validation-for="Input.Serie" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="Input.ClienteId" class="form-label"></label>
+                    <select asp-for="Input.ClienteId" class="form-select" asp-items="Model.ClientesSelect">
+                        <option value="">-- Seleccione cliente --</option>
+                    </select>
+                    <span asp-validation-for="Input.ClienteId" class="text-danger"></span>
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="Input.AlmacenId" class="form-label"></label>
+                    <select asp-for="Input.AlmacenId" class="form-select" asp-items="Model.AlmacenesSelect">
+                        <option value="">-- Seleccione almacén --</option>
+                    </select>
+                    <span asp-validation-for="Input.AlmacenId" class="text-danger"></span>
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="Input.CondicionPagoId" class="form-label"></label>
+                    <select asp-for="Input.CondicionPagoId" class="form-select" asp-items="Model.CondicionesSelect">
+                        <option value="">-- Contado --</option>
+                    </select>
+                </div>
+            </div>
+
+            <hr />
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="m-0">Líneas</h5>
+                <button class="btn btn-sm btn-outline-primary" type="button" id="btnAddLinea">Agregar línea</button>
+            </div>
+
+            <div class="table-responsive mt-2">
+                <table class="table table-sm align-middle">
+                    <thead>
+                        <tr>
+                            <th style="width:55%">Producto</th>
+                            <th style="width:15%">Cantidad</th>
+                            <th style="width:15%">Precio</th>
+                            <th style="width:15%"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyLineas">
+                        @for (int i = 0; i < Model.Input.Lineas.Count; i++)
+                        {
+                            <tr>
+                                <td>
+                                    <select asp-for="Input.Lineas[i].ProductoId"
+                                            class="form-select"
+                                            asp-items="Model.ProductosSelect"
+                                            onchange="setPrecio(@i, this.value)">
+                                        <option value="">-- Seleccione --</option>
+                                    </select>
+                                    <span asp-validation-for="Input.Lineas[i].ProductoId" class="text-danger"></span>
+                                </td>
+                                <td>
+                                    <input asp-for="Input.Lineas[i].Cantidad" class="form-control" type="number" min="1" />
+                                    <span asp-validation-for="Input.Lineas[i].Cantidad" class="text-danger"></span>
+                                </td>
+                                <td>
+                                    <input asp-for="Input.Lineas[i].PrecioUnitario" class="form-control" type="number" step="0.01" min="0" />
+                                    <span asp-validation-for="Input.Lineas[i].PrecioUnitario" class="text-danger"></span>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-outline-danger btnRemove">Quitar</button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="d-flex gap-2 mt-3">
+                <button class="btn btn-primary" type="submit">Guardar</button>
+                <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- SELECT oculto que contiene las opciones de productos ya renderizadas por Razor -->
+<select id="productosOptions" class="d-none" asp-items="Model.ProductosSelect">
+    <option value="">-- Seleccione --</option>
+</select>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        // Diccionario { productoId: precio } generado por el servidor
+        const precios = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.PreciosPorProducto));
+
+        function setPrecio(index, productoId) {
+          const precio = precios[productoId] ?? 0;
+          const input = document.querySelector(`[name="Input.Lineas[${index}].PrecioUnitario"]`);
+          if (!input) return;
+          const current = parseFloat(input.value || "0");
+          if (!current || current === 0) input.value = (precio ?? 0).toFixed(2);
+        }
+
+        // Plantilla de fila usando las opciones precargadas del <select> oculto
+        const tbody = document.getElementById('tbodyLineas');
+        const btnAdd = document.getElementById('btnAddLinea');
+        const optionsHtml = document.getElementById('productosOptions')?.innerHTML ?? '<option value="">-- Seleccione --</option>';
+
+        function crearFila(idx) {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>
+              <select class="form-select" name="Input.Lineas[${idx}].ProductoId" onchange="setPrecio(${idx}, this.value)">
+                ${optionsHtml}
+              </select>
+            </td>
+            <td><input class="form-control" name="Input.Lineas[${idx}].Cantidad" type="number" min="1" value="1" /></td>
+            <td><input class="form-control" name="Input.Lineas[${idx}].PrecioUnitario" type="number" step="0.01" min="0" value="0" /></td>
+            <td><button type="button" class="btn btn-sm btn-outline-danger btnRemove">Quitar</button></td>
+          `;
+          return tr;
+        }
+
+        function reindex() {
+          [...tbody.querySelectorAll('tr')].forEach((tr, idx) => {
+            // renombrar inputs y el onchange del select
+            const sel = tr.querySelector('select');
+            const qty = tr.querySelector('input[name*=".Cantidad"]');
+            const price = tr.querySelector('input[name*=".PrecioUnitario"]');
+
+            if (sel) {
+              sel.name = `Input.Lineas[${idx}].ProductoId`;
+              sel.setAttribute('onchange', `setPrecio(${idx}, this.value)`);
+            }
+            if (qty) qty.name = `Input.Lineas[${idx}].Cantidad`;
+            if (price) price.name = `Input.Lineas[${idx}].PrecioUnitario`;
+          });
+        }
+
+        btnAdd?.addEventListener('click', () => {
+          const tr = crearFila(tbody.children.length);
+          tbody.appendChild(tr);
+        });
+
+        tbody?.addEventListener('click', (e) => {
+          if (e.target.classList.contains('btnRemove')) {
+            e.target.closest('tr').remove();
+            reindex();
+          }
+        });
+    </script>
+}
+
+
