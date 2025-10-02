@@ -89,7 +89,7 @@ namespace ERP_ArquiSoftware.Pages.Facturacion.Facturas
             var factura = new FacturaVenta
             {
                 Serie = Input.Serie,
-                Numero = sec.SiguienteNumero,   // se usa y luego se avanza
+                Numero = sec.SiguienteNumero,   
                 Fecha = DateTime.Now,
                 ClienteId = Input.ClienteId!.Value,
                 AlmacenId = Input.AlmacenId!.Value,
@@ -108,7 +108,7 @@ namespace ERP_ArquiSoftware.Pages.Facturacion.Facturas
                     return Page();
                 }
 
-                // Si el usuario deja 0, usamos el precio del producto (UX + seguridad server-side)
+                // Si el usuario deja 0, usamos el precio del producto 
                 var precio = l.PrecioUnitario > 0 ? l.PrecioUnitario : prod.PrecioUnitario;
 
                 var neto = precio * l.Cantidad;
