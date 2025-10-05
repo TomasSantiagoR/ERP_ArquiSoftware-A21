@@ -1,17 +1,25 @@
-using System.ComponentModel.DataAnnotations;
 using ERP_ArquiSoftware.dA;
 using ERP_ArquiSoftware.Models.Ventas;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace ERP_ArquiSoftware.Pages.Ventas.Clientes
 {
+    [Authorize(Policy = "Clientes.Ver")]
     public class UpsertModel : PageModel
     {
         private readonly AppDBContext _ctx;
-        public UpsertModel(AppDBContext ctx) => _ctx = ctx;
+        private readonly IAuthorizationService _authz;
+
+        public UpsertModel(AppDBContext ctx, IAuthorizationService authz)
+        {
+            _ctx = ctx;
+            _authz = authz;
+        }
 
         public class Vm
         {
@@ -54,6 +62,10 @@ namespace ERP_ArquiSoftware.Pages.Ventas.Clientes
 
             if (id.HasValue)
             {
+                // --- EDITAR => requiere Clientes.Editar ---
+                var canEdit = await _authz.AuthorizeAsync(User, "Clientes.Editar");
+                if (!canEdit.Succeeded) return Forbid();
+
                 var c = await _ctx.Clientes.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id.Value);
                 if (c == null) return NotFound();
 
@@ -70,6 +82,12 @@ namespace ERP_ArquiSoftware.Pages.Ventas.Clientes
                     Activo = c.Activo
                 };
             }
+            else
+            {
+                // --- CREAR => requiere Clientes.Crear ---
+                var canCreate = await _authz.AuthorizeAsync(User, "Clientes.Crear");
+                if (!canCreate.Succeeded) return Forbid();
+            }
 
             return Page();
         }
@@ -77,6 +95,11 @@ namespace ERP_ArquiSoftware.Pages.Ventas.Clientes
         public async Task<IActionResult> OnPostAsync()
         {
             await CargarCondicionesAsync();
+
+            // Política según operación: crear vs editar
+            var policy = (Input.Id == 0) ? "Clientes.Crear" : "Clientes.Editar";
+            var ok = await _authz.AuthorizeAsync(User, policy);
+            if (!ok.Succeeded) return Forbid();
 
             // Unicidad por TipoDocumento + NumeroDocumento
             var existe = await _ctx.Clientes

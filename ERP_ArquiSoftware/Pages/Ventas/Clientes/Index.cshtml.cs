@@ -1,10 +1,13 @@
 using ERP_ArquiSoftware.dA;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 
 namespace ERP_ArquiSoftware.Pages.Ventas.Clientes
 {
+
+    [Authorize(Policy = "Clientes.Ver")]
     public class IndexModel : PageModel
     {
         private readonly AppDBContext _ctx;
@@ -62,6 +65,8 @@ namespace ERP_ArquiSoftware.Pages.Ventas.Clientes
                 .ToListAsync();
         }
 
+
+        [Authorize(Policy = "Clientes.Eliminar")]
         public async Task<IActionResult> OnPostDeleteAsync(int id)
         {
             var hasDocs = await _ctx.FacturasVenta.AnyAsync(f => f.ClienteId == id)

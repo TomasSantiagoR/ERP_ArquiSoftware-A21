@@ -9,7 +9,7 @@ namespace ERP_ArquiSoftware.dA
 {
     public class AppDBContext : DbContext
     {
-        public AppDBContext(DbContextOptions options) : base(options) { }
+        public AppDBContext(DbContextOptions<AppDBContext> options) : base(options) { }
 
         // Ventas
         public DbSet<ERP_ArquiSoftware.Models.Ventas.Cliente> Clientes { get; set; }

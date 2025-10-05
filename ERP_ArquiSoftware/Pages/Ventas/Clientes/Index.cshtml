@@ -1,11 +1,25 @@
 ﻿@page
 @model ERP_ArquiSoftware.Pages.Ventas.Clientes.IndexModel
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService Authz
+
 @{
     ViewData["Title"] = "Clientes";
+
+    // Flags de permisos (según políticas definidas en program.cs)
+    var puedeCrear = (await Authz.AuthorizeAsync(User, "Clientes.Crear")).Succeeded;
+    var puedeEditar = (await Authz.AuthorizeAsync(User, "Clientes.Editar")).Succeeded;
+    var puedeEliminar = (await Authz.AuthorizeAsync(User, "Clientes.Eliminar")).Succeeded;
 }
+
 <div class="d-flex justify-content-between align-items-center mb-2">
     <h3 class="m-0">@ViewData["Title"]</h3>
-    <a asp-page="Upsert" class="btn btn-primary">Nuevo Cliente</a>
+
+    @* Botón Nuevo solo si tiene permiso de crear *@
+    @if (puedeCrear)
+    {
+        <a asp-page="Upsert" class="btn btn-primary">Nuevo Cliente</a>
+    }
 </div>
 
 <form method="get" class="row g-2 mb-3">
@@ -25,7 +39,7 @@
                     <th>Contacto</th>
                     <th>Cond. Pago</th>
                     <th>Estado</th>
-                    <th style="width:140px;"></th>
+                    <th style="width:220px;" class="text-end">Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -59,14 +73,31 @@
                                 }
                             </td>
                             <td class="text-end">
-                                <a asp-page="Upsert" asp-route-id="@c.Id" class="btn btn-sm btn-primary">Editar</a>
-                                <form method="post" asp-page-handler="Delete" asp-route-id="@c.Id" class="d-inline"
-                                      onsubmit="return confirm('¿Eliminar cliente?')">
-                                    <button class="btn btn-sm btn-danger">Borrar</button>
-                                    <a asp-page="/Ventas/Clientes/Direcciones" asp-route-clienteId="@c.Id"
-                                       class="btn btn-sm btn-outline-info">Direcciones</a>
+                                @* Editar solo si tiene permiso *@
+                                @if (puedeEditar)
+                                {
+                                    <a asp-page="Upsert" asp-route-id="@c.Id" class="btn btn-sm btn-primary me-1">Editar</a>
+                                }
 
-                                </form>
+                                @* Direcciones: lectura general (siempre visible, o agrega política si quieres) *@
+                                <a asp-page="/Ventas/Clientes/Direcciones"
+                                   asp-route-clienteId="@c.Id"
+                                   class="btn btn-sm btn-outline-info me-1">
+                                    Direcciones
+                                </a>
+
+                                @* Borrar solo si tiene permiso. Form independiente *@
+                                @if (puedeEliminar)
+                                {
+                                    <form method="post"
+                                          asp-page-handler="Delete"
+                                          asp-route-id="@c.Id"
+                                          class="d-inline"
+                                          onsubmit="return confirm('¿Eliminar cliente?')">
+                                        @Html.AntiForgeryToken()
+                                        <button class="btn btn-sm btn-danger">Borrar</button>
+                                    </form>
+                                }
                             </td>
                         </tr>
                     }
