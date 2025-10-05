@@ -1,4 +1,13 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService Auth
+@{
+    var isAuth = User?.Identity?.IsAuthenticated ?? false;
+    var canVentas = isAuth && (await Auth.AuthorizeAsync(User, "Ventas")).Succeeded;
+    var canInvRead = isAuth && (await Auth.AuthorizeAsync(User, "Inventario.Read")).Succeeded;
+    var canRRHH = isAuth && (await Auth.AuthorizeAsync(User, "RRHH")).Succeeded;
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -12,7 +21,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <!-- Fuente de Google (ejemplo: Plus Jakarta Sans) -->
+    <!-- Fuente de Google -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;700&display=swap" rel="stylesheet">
 
     <!-- CSS de librerías -->
@@ -23,8 +32,6 @@
     <link rel="stylesheet" href="~/ERP_ArquiSoftware.styles.css" asp-append-version="true" />
 
     @await RenderSectionAsync("Styles", required: false)
-
-    
 </head>
 
 <body>
@@ -32,47 +39,86 @@
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-page="/Index">
-                    <i class="ri-dashboard-line"></i>ERP_ArquiSoftware
-                    </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                    <i class="ri-dashboard-line"></i> ERP_ArquiSoftware
+                </a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
+                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
+
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <!-- Menú centrado, controlado por políticas -->
                     <ul class="navbar-nav mx-auto">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Ventas/Clientes/Home">Ventas</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Facturacion/Facturas/Index">Facturación</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/RRHH/Home">RRHH</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Proveedores/HomeProv">Proveedores</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Inventario/HomeInv">Inventario</a>
-                        </li>
+                        @if (canVentas)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-page="/Ventas/Clientes/Home">Ventas</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-page="/Facturacion/Facturas/Index">Facturación</a>
+                            </li>
+                        }
+                        @if (canRRHH)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-page="/RRHH/Home">RRHH</a>
+                            </li>
+                        }
+                        @if (canInvRead)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-page="/Inventario/HomeInv">Inventario</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-page="/Maestros/Almacenes/Index">Almacenes</a>
+                            </li>
+                        }
+                        @* Proveedores: si quieres restringirlo, crea una policy y cámbialo *@
+                        @if (isAuth)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-page="/Proveedores/HomeProv">Proveedores</a>
+                            </li>
+                        }
+                    </ul>
+
+                    <!-- Login / Logout a la derecha -->
+                    <ul class="navbar-nav ms-auto">
+                        @if (isAuth)
+                        {
+                            <li class="nav-item">
+                                <span class="nav-link">Hola, @User.Identity!.Name</span>
+                            </li>
+                            <li class="nav-item">
+                                <form class="d-inline" asp-area="Identity" asp-page="/Account/Logout" method="post">
+                                    <button type="submit" class="btn btn-link nav-link">Salir</button>
+                                </form>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="Identity" asp-page="/Account/Login">Ingresar</a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
-        <div class="container-fluid d-flex min-vh-100 ">
-            <div class="d-flex flex-grow-1">
-                <aside class="erp-sidebar">
-                    @await Html.PartialAsync("_SideMenu")
-                </aside>
 
-                <main class="flex-grow-1 py-3 px-3">
-                    @RenderBody()
-                </main>
-            </div>
+    <div class="container-fluid d-flex min-vh-100 ">
+        <div class="d-flex flex-grow-1">
+            <aside class="erp-sidebar">
+                @await Html.PartialAsync("_SideMenu")
+            </aside>
+
+            <main class="flex-grow-1 py-3 px-3">
+                @RenderBody()
+            </main>
         </div>
-    
-
+    </div>
 
     <footer class="border-top footer text-muted">
         <div class="container">
@@ -87,3 +133,4 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+

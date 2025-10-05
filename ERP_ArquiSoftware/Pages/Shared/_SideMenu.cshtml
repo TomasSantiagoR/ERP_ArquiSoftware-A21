@@ -1,74 +1,138 @@
-﻿
+﻿@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService Auth
+@{
+    var isAuth = User?.Identity?.IsAuthenticated ?? false;
+    var canVentas = isAuth && (await Auth.AuthorizeAsync(User, "Ventas")).Succeeded;
+    var canInvRead = isAuth && (await Auth.AuthorizeAsync(User, "Inventario.Read")).Succeeded;
+    var canRRHH = isAuth && (await Auth.AuthorizeAsync(User, "RRHH")).Succeeded;
 
-
-
+    var displayName = User?.Identity?.Name ?? "Invitado";
+}
 
 <ul class="sidebar__list">
+    <!-- Logo/brand -->
     <li class="sidebar__element">
-        <a class="sidebar__icon sidebar__icon--logo">
+        <a class="sidebar__icon sidebar__icon--logo" asp-area="" asp-page="/Index">
             <i class="ri-microsoft-line sidebar__logo-icon"></i>
         </a>
-
         <div class="sidebar__hide">
             <span>ERP</span>
         </div>
     </li>
 
+    <!-- Dashboard -->
     <li class="sidebar__element">
-        <a class="sidebar__icon">
+        <a class="sidebar__icon" asp-area="" asp-page="/Index">
             <i class="ri-dashboard-2-line"></i>
         </a>
-
         <div class="sidebar__hide">
             <span class="sidebar__text">Dashboard</span>
         </div>
     </li>
 
-    <li class="sidebar__element">
-        <a class="sidebar__icon">
-            <i class="ri-message-2-line"></i>
-        </a>
+    <!-- Ventas -->
+    @if (canVentas)
+    {
+        <li class="sidebar__element">
+            <a class="sidebar__icon" asp-area="" asp-page="/Ventas/Clientes/Home">
+                <i class="ri-shopping-bag-3-line"></i>
+            </a>
+            <div class="sidebar__hide">
+                <span class="sidebar__text">Ventas</span>
+            </div>
+        </li>
+        <li class="sidebar__element">
+            <a class="sidebar__icon" asp-area="" asp-page="/Facturacion/Facturas/Index">
+                <i class="ri-receipt-line"></i>
+            </a>
+            <div class="sidebar__hide">
+                <span class="sidebar__text">Facturación</span>
+            </div>
+        </li>
+    }
 
-        <div class="sidebar__hide">
-            <span class="sidebar__text">Mensajes</span>
-        </div>
-    </li>
+    <!-- Inventario -->
+    @if (canInvRead)
+    {
+        <li class="sidebar__element">
+            <a class="sidebar__icon" asp-area="" asp-page="/Inventario/HomeInv">
+                <i class="ri-archive-2-line"></i>
+            </a>
+            <div class="sidebar__hide">
+                <span class="sidebar__text">Inventario</span>
+            </div>
+        </li>
+        <li class="sidebar__element">
+            <a class="sidebar__icon" asp-area="" asp-page="/Maestros/Almacenes/Index">
+                <i class="ri-building-2-line"></i>
+            </a>
+            <div class="sidebar__hide">
+                <span class="sidebar__text">Almacenes</span>
+            </div>
+        </li>
+    }
 
-    <li class="sidebar__element">
-        <a class="sidebar__icon">
-            <i class="ri-task-line"></i>
-        </a>
+    <!-- Proveedores (si quieres restringir, crea policy y cámbiala aquí) -->
+    @if (isAuth)
+    {
+        <li class="sidebar__element">
+            <a class="sidebar__icon" asp-area="" asp-page="/Proveedores/HomeProv">
+                <i class="ri-truck-line"></i>
+            </a>
+            <div class="sidebar__hide">
+                <span class="sidebar__text">Proveedores</span>
+            </div>
+        </li>
+    }
 
-        <div class="sidebar__hide">
-            <span class="sidebar__text">Tareas</span>
-        </div>
-    </li>
+    <!-- RRHH -->
+    @if (canRRHH)
+    {
+        <li class="sidebar__element">
+            <a class="sidebar__icon" asp-area="" asp-page="/RRHH/Home">
+                <i class="ri-team-line"></i>
+            </a>
+            <div class="sidebar__hide">
+                <span class="sidebar__text">RRHH</span>
+            </div>
+        </li>
+    }
 
+    <!-- Usuario / Perfil -->
     <li class="sidebar__element">
         <a class="sidebar__icon">
             <i class="ri-user-line"></i>
         </a>
-
         <div class="sidebar__hide">
-            <span class="sidebar__text">Usuario</span>
+            <span class="sidebar__text">@displayName</span>
         </div>
     </li>
 
+    <!-- Avatar + Login/Logout -->
     <li class="sidebar__element sidebar__element--avatar">
-
         <img src="/Images/userexample.jpg" class="sidebar__icon sidebar__icon--avatar" />
-
         <div class="sidebar__hide">
-            <h3 class="sidebar__title">Tomas Santiago</h3>
-            <p class="sidebar__info">Cuenta Administrativa</p>
+            <h3 class="sidebar__title">@displayName</h3>
+            <p class="sidebar__info">
+                @(isAuth ? "Conectado" : "Invitado")
+            </p>
+
+            @if (!isAuth)
+            {
+                <a class="btn btn-sm btn-outline-primary mt-2" asp-area="Identity" asp-page="/Account/Login">
+                    Ingresar
+                </a>
+            }
+            else
+            {
+                <form asp-area="Identity" asp-page="/Account/Logout" method="post" class="mt-2">
+                    <button type="submit" class="btn btn-sm btn-outline-secondary">Salir</button>
+                </form>
+            }
         </div>
-
     </li>
-
-
-
-    
 </ul>
+
 
 
 
