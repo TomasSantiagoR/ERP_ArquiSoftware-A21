@@ -10,12 +10,16 @@ builder.Services.AddRazorPages();
 
 // Servicios propios
 builder.Services.AddScoped<IInventarioService, InventarioService>();
+builder.Services.AddScoped<INominaService, NominaService>();
+builder.Services.AddScoped<INotificacionService, NotificacionService>();
+
+
 
 // DbContext de la app (tu ERP)
 builder.Services.AddDbContext<AppDBContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// DbContext para Identity (usuarios/roles) -> usa la misma connection string
+// DbContext para Identity (usuarios/roles) -> misma conexión
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -31,41 +35,48 @@ builder.Services
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
-// Autorización por políticas (módulos)
+// -------- AUTORIZACIÓN (un solo bloque) --------
 builder.Services.AddAuthorization(options =>
 {
+    // ===== MÓDULOS =====
     options.AddPolicy("Ventas", p => p.RequireRole("Admin", "Cajero", "Facturacion"));
     options.AddPolicy("Inventario.Read", p => p.RequireRole("Admin", "Inventario"));
-    options.AddPolicy("Inventario.Edit", p => p.RequireRole("Admin")); // solo admin edita
+    options.AddPolicy("Inventario.Edit", p => p.RequireRole("Admin")); // solo Admin edita
     options.AddPolicy("RRHH", p => p.RequireRole("Admin", "RRHH"));
+
+    // ===== CAPACIDADES: CLIENTES =====
+    options.AddPolicy("Clientes.Ver", p => p.RequireRole("Admin", "Cajero", "Facturacion"));
+    options.AddPolicy("Clientes.Crear", p => p.RequireRole("Admin", "Cajero"));
+    options.AddPolicy("Clientes.Editar", p => p.RequireRole("Admin"));
+    options.AddPolicy("Clientes.Eliminar", p => p.RequireRole("Admin"));
+
+    // ===== CAPACIDADES: PEDIDOS =====
+    options.AddPolicy("Pedidos.Ver", p => p.RequireRole("Admin", "Cajero", "Facturacion"));
+    options.AddPolicy("Pedidos.Crear", p => p.RequireRole("Admin", "Cajero"));
+    options.AddPolicy("Pedidos.Editar", p => p.RequireRole("Admin"));
+    options.AddPolicy("Pedidos.Eliminar", p => p.RequireRole("Admin"));
 });
-
-
-// Autorización por políticas (capacidades)
-builder.Services.AddAuthorization(options =>
-{
-    // ---- CLIENTES ----
-    options.AddPolicy("Clientes.Ver", p => p.RequireRole("Admin", "Ventas", "Cajero", "Facturacion"));
-    options.AddPolicy("Clientes.Crear", p => p.RequireRole("Admin", "Ventas", "Cajero"));
-    options.AddPolicy("Clientes.Editar", p => p.RequireRole("Admin", "Ventas")); // ❗ SIN 'Cajero'
-    options.AddPolicy("Clientes.Eliminar", p => p.RequireRole("Admin"));          // ❗ solo Admin
-
-    // (opcional) otras capacidades…
-    options.AddPolicy("Ventas", p => p.RequireRole("Admin", "Cajero", "Facturacion"));
-    options.AddPolicy("Inventario.Read", p => p.RequireRole("Admin", "Inventario"));
-    options.AddPolicy("Inventario.Edit", p => p.RequireRole("Admin"));
-    options.AddPolicy("RRHH", p => p.RequireRole("Admin", "RRHH"));
-});
-
 
 // Autorizar por carpetas/páginas 
 builder.Services.AddRazorPages(options =>
 {
-    // Ventas/Facturación
+    // Ventas (clientes, pedidos)
     options.Conventions.AuthorizeFolder("/Ventas", "Ventas");
+
+    // Clientes (granular si quieres asegurar aún más)
+    options.Conventions.AuthorizePage("/Ventas/Clientes/Index", "Clientes.Ver");
+    options.Conventions.AuthorizePage("/Ventas/Clientes/Upsert", "Clientes.Crear"); // la misma página sirve crear/editar; el botón Editar lo ocultas en vista para roles sin permiso
+
+    // Pedidos (granular)
+    options.Conventions.AuthorizePage("/Ventas/Pedidos/Index", "Pedidos.Ver");
+    options.Conventions.AuthorizePage("/Ventas/Pedidos/Create", "Pedidos.Crear");
+    options.Conventions.AuthorizePage("/Ventas/Pedidos/Edit", "Pedidos.Editar");
+    options.Conventions.AuthorizePage("/Ventas/Pedidos/Delete", "Pedidos.Eliminar");
+
+    // Facturación bajo Ventas
     options.Conventions.AuthorizeFolder("/Facturacion", "Ventas");
 
-    // Inventario: lectura para Inventario.Read, edición solo Admin
+    // Inventario
     options.Conventions.AuthorizeFolder("/Inventario", "Inventario.Read");
     options.Conventions.AuthorizePage("/Inventario/EditInv", "Inventario.Edit");
     options.Conventions.AuthorizePage("/Inventario/CreateInv", "Inventario.Edit");
@@ -73,7 +84,7 @@ builder.Services.AddRazorPages(options =>
     // RRHH
     options.Conventions.AuthorizeFolder("/RRHH", "RRHH");
 
-    // Login/Logout públicos (UI por defecto de Identity)
+    // Login/Logout públicos (Identity UI)
     options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/Login");
     options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/Logout");
 });
@@ -87,20 +98,15 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-// HTTPS + Static
 app.UseHttpsRedirection();
 
-// Ruteo
 app.UseRouting();
 
-// **Importante**: primero autenticación, luego autorización
+// Autenticación → Autorización (orden importa)
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Static files (tu proyecto ya lo usa)
 app.MapStaticAssets();
-
-// Razor Pages
 app.MapRazorPages().WithStaticAssets();
 
 // ===== Migraciones + seed (solo en Development) =====
@@ -108,13 +114,11 @@ if (app.Environment.IsDevelopment())
 {
     using var scope = app.Services.CreateScope();
 
-    // Migrar ambas BD
     var appDb = scope.ServiceProvider.GetRequiredService<AppDBContext>();
     var idDb = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     appDb.Database.Migrate();
     idDb.Database.Migrate();
 
-    // Seed de roles/usuarios demo
     await SeedIdentityAsync(scope.ServiceProvider);
 }
 
@@ -128,6 +132,7 @@ static async Task SeedIdentityAsync(IServiceProvider services)
     var roleMgr = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
 
+    // Crea los roles si no existen
     string[] roles = { "Admin", "Cajero", "Inventario", "Facturacion", "RRHH" };
     foreach (var r in roles)
         if (!await roleMgr.RoleExistsAsync(r))
@@ -153,4 +158,3 @@ static async Task SeedIdentityAsync(IServiceProvider services)
         await userMgr.AddToRolesAsync(cajero, new[] { "Cajero", "Facturacion" });
     }
 }
-

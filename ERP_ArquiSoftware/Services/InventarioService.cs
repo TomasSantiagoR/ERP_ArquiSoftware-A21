@@ -9,7 +9,13 @@ namespace ERP_ArquiSoftware.Services
     public class InventarioService : IInventarioService
     {
         private readonly AppDBContext _ctx;
-        public InventarioService(AppDBContext ctx) => _ctx = ctx;
+        private readonly INotificacionService _notifs;
+
+        public InventarioService(AppDBContext ctx, INotificacionService notifs)
+        {
+            _ctx = ctx;
+            _notifs = notifs;
+        }
 
         public async Task DescargarStockPorFacturaAsync(int facturaId, bool withTransaction = true, CancellationToken ct = default)
         {
@@ -41,8 +47,10 @@ namespace ERP_ArquiSoftware.Services
                     if (ex.Stock < l.Cantidad)
                         throw new InvalidOperationException($"Stock insuficiente para producto {l.ProductoId}. Disponible {ex.Stock}, requerido {l.Cantidad}.");
 
+                    // ↓ Descontar stock
                     ex.Stock -= l.Cantidad;
 
+                    // Registrar movimiento
                     _ctx.MovimientosInventario.Add(new MovimientoInventario
                     {
                         Fecha = DateTime.Now,
@@ -53,6 +61,27 @@ namespace ERP_ArquiSoftware.Services
                         DocumentoTipo = "FacturaVenta",
                         DocumentoId = f.Id
                     });
+
+                    // === Notificación de bajo stock ===
+                    // Cargar datos (sin tracking para no contaminar el change tracker)
+                    var prod = await _ctx.Productos
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync(p => p.Id == l.ProductoId, ct);
+
+                    var alm = await _ctx.Almacenes
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync(a => a.Id == f.AlmacenId, ct);
+
+                    // Disparar evaluación de bajo stock
+                    await _notifs.EvaluarBajoStockAsync(
+                        productoId: l.ProductoId,
+                        almacenId: f.AlmacenId,
+                        stockActual: ex.Stock,
+                        puntoReorden: prod?.PuntoReorden,
+                        productoNombre: prod?.NombreProducto,
+                        almacenNombre: alm?.Nombre,
+                        ct: ct
+                    );
                 }
 
                 await _ctx.SaveChangesAsync(ct);
@@ -120,5 +149,6 @@ namespace ERP_ArquiSoftware.Services
         }
     }
 }
+
 
 

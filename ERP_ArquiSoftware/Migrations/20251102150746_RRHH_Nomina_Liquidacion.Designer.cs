@@ -4,6 +4,7 @@ using ERP_ArquiSoftware.dA;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ERP_ArquiSoftware.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    partial class AppDBContextModelSnapshot : ModelSnapshot
+    [Migration("20251102150746_RRHH_Nomina_Liquidacion")]
+    partial class RRHH_Nomina_Liquidacion
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -456,67 +459,6 @@ namespace ERP_ArquiSoftware.Migrations
                     b.ToTable("UnidadesMedida");
                 });
 
-            modelBuilder.Entity("ERP_ArquiSoftware.Models.Notificacion", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("AlmacenId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("AlmacenNombre")
-                        .HasMaxLength(120)
-                        .HasColumnType("nvarchar(120)");
-
-                    b.Property<DateTime>("Creado")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Mensaje")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<int?>("ProductoId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ProductoNombre")
-                        .HasMaxLength(120)
-                        .HasColumnType("nvarchar(120)");
-
-                    b.Property<int?>("PuntoReorden")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Severidad")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<int?>("Stock")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Tipo")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
-                    b.Property<string>("Titulo")
-                        .IsRequired()
-                        .HasMaxLength(120)
-                        .HasColumnType("nvarchar(120)");
-
-                    b.Property<bool>("Visto")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Tipo", "ProductoId", "AlmacenId", "Visto", "Creado");
-
-                    b.ToTable("Notificaciones");
-                });
-
             modelBuilder.Entity("ERP_ArquiSoftware.Models.ProductoProveedor", b =>
                 {
                     b.Property<int>("ProductoId")
@@ -865,140 +807,6 @@ namespace ERP_ArquiSoftware.Migrations
                     b.HasIndex("PeriodoNominaId");
 
                     b.ToTable("Nominas");
-                });
-
-            modelBuilder.Entity("ERP_ArquiSoftware.Models.RRHH.NovedadNomina", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Anio")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("AuxilioNoConstitutivo")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("Bonificaciones")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("Comisiones")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("DiasIncapacidadEPS")
-                        .HasColumnType("int");
-
-                    b.Property<int>("DiasLicenciaRemunerada")
-                        .HasColumnType("int");
-
-                    b.Property<int>("DiasNoRemunerados")
-                        .HasColumnType("int");
-
-                    b.Property<int>("DiasVacacionesTomadas")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Embargo")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("EmpleadoId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("HED")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("HEDFest")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("HEN")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("HENFest")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("Mes")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("OtrasDeducciones")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("PrestamoEmpresa")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("RecargoNocturno")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("NovedadesNomina");
-                });
-
-            modelBuilder.Entity("ERP_ArquiSoftware.Models.RRHH.ParamNomina", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("Activo")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("Anio")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("AuxilioTransporte")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("CesantiasPorc")
-                        .HasColumnType("decimal(5,4)");
-
-                    b.Property<int>("DiasMes")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("InteresesCesantiasAnualPorc")
-                        .HasColumnType("decimal(5,4)");
-
-                    b.Property<decimal>("PensionEmpleadoPorc")
-                        .HasColumnType("decimal(5,4)");
-
-                    b.Property<decimal>("PrimaPorc")
-                        .HasColumnType("decimal(5,4)");
-
-                    b.Property<decimal>("SMMLV")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("SaludEmpleadoPorc")
-                        .HasColumnType("decimal(5,4)");
-
-                    b.Property<int>("TopeAuxTranspMultiplo")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("VacacionesPorc")
-                        .HasColumnType("decimal(5,4)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ParametrosNomina");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Activo = true,
-                            Anio = 2025,
-                            AuxilioTransporte = 162000m,
-                            CesantiasPorc = 0.0833m,
-                            DiasMes = 30,
-                            InteresesCesantiasAnualPorc = 0.12m,
-                            PensionEmpleadoPorc = 0.04m,
-                            PrimaPorc = 0.0833m,
-                            SMMLV = 1300000m,
-                            SaludEmpleadoPorc = 0.04m,
-                            TopeAuxTranspMultiplo = 2,
-                            VacacionesPorc = 0.0417m
-                        });
                 });
 
             modelBuilder.Entity("ERP_ArquiSoftware.Models.RRHH.PeriodoNomina", b =>

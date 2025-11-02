@@ -2,13 +2,19 @@
 @inject IAuthorizationService Auth
 @{
     var isAuth = User?.Identity?.IsAuthenticated ?? false;
-    var canVentas = isAuth && (await Auth.AuthorizeAsync(User, "Ventas")).Succeeded;
-    var canInvRead = isAuth && (await Auth.AuthorizeAsync(User, "Inventario.Read")).Succeeded;
-    var canRRHH = isAuth && (await Auth.AuthorizeAsync(User, "RRHH")).Succeeded;
+
+    // ¡User! para evitar warnings de nullability cuando estás autenticado!
+    var canVentas = isAuth && (await Auth.AuthorizeAsync(User!, "Ventas")).Succeeded;
+    var canInvRead = isAuth && (await Auth.AuthorizeAsync(User!, "Inventario.Read")).Succeeded;
+    var canRRHH = isAuth && (await Auth.AuthorizeAsync(User!, "RRHH")).Succeeded;
+
+    // Contador de notificaciones no leídas (opcional)
+    var notifCountObj = ViewData["NotifCount"];
+    int? notifCount = notifCountObj is int c ? c : null;
 }
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -17,14 +23,12 @@
     <!-- Remix Icon CDN -->
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet">
 
-    <!-- Preconexión para mejorar la carga de fuentes -->
+    <!-- Fuentes -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <!-- Fuente de Google -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;700&display=swap" rel="stylesheet">
 
-    <!-- CSS de librerías -->
+    <!-- Bootstrap -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 
     <!-- CSS del proyecto -->
@@ -32,14 +36,38 @@
     <link rel="stylesheet" href="~/ERP_ArquiSoftware.styles.css" asp-append-version="true" />
 
     @await RenderSectionAsync("Styles", required: false)
+
+    <style>
+        /* Posicionar badge sobre el ícono del navbar de forma linda */
+        .nav-icon {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.25rem;
+            height: 2.25rem;
+            border-radius: 50%;
+        }
+
+            .nav-icon:hover {
+                background: rgba(0,0,0,.05);
+            }
+
+        .notif-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            transform: translate(35%,-35%);
+        }
+    </style>
 </head>
 
 <body>
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-page="/Index">
-                    <i class="ri-dashboard-line"></i> ERP_ArquiSoftware
+                <a class="navbar-brand d-flex align-items-center gap-2" asp-area="" asp-page="/Index">
+                    <i class="ri-dashboard-line"></i> <span>ERP_ArquiSoftware</span>
                 </a>
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
@@ -48,7 +76,7 @@
                 </button>
 
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <!-- Menú centrado, controlado por políticas -->
+                    <!-- Menú centrado controlado por políticas -->
                     <ul class="navbar-nav mx-auto">
                         @if (canVentas)
                         {
@@ -74,7 +102,7 @@
                                 <a class="nav-link text-dark" asp-area="" asp-page="/Maestros/Almacenes/Index">Almacenes</a>
                             </li>
                         }
-                        @* Proveedores: si quieres restringirlo, crea una policy y cámbialo *@
+                        @* Proveedores: si deseas, crea una policy y la aplicas igual *@
                         @if (isAuth)
                         {
                             <li class="nav-item">
@@ -83,12 +111,29 @@
                         }
                     </ul>
 
-                    <!-- Login / Logout a la derecha -->
-                    <ul class="navbar-nav ms-auto">
+                    <!-- Íconos + Login/Logout a la derecha -->
+                    <ul class="navbar-nav ms-auto align-items-center">
+
+                        @* Campana de notificaciones (solo autenticado) *@
                         @if (isAuth)
                         {
-                            <li class="nav-item">
-                                <span class="nav-link">Hola, @User.Identity!.Name</span>
+                            <li class="nav-item me-1">
+                                <a class="nav-link nav-icon" asp-area="" asp-page="/Notificaciones/Index" title="Notificaciones">
+                                    <i class="ri-notification-3-line"></i>
+                                    @if (notifCount.HasValue && notifCount.Value > 0)
+                                    {
+                                        <span class="badge rounded-pill text-bg-danger notif-badge">
+                                            @((notifCount.Value > 99) ? "99+" : notifCount.Value.ToString())
+                                        </span>
+                                    }
+                                </a>
+                            </li>
+                        }
+
+                        @if (isAuth)
+                        {
+                            <li class="nav-item d-none d-sm-block">
+                                <span class="nav-link">Hola, @User!.Identity!.Name</span>
                             </li>
                             <li class="nav-item">
                                 <form class="d-inline" asp-area="Identity" asp-page="/Account/Logout" method="post">
@@ -108,7 +153,7 @@
         </nav>
     </header>
 
-    <div class="container-fluid d-flex min-vh-100 ">
+    <div class="container-fluid d-flex min-vh-100">
         <div class="d-flex flex-grow-1">
             <aside class="erp-sidebar">
                 @await Html.PartialAsync("_SideMenu")
@@ -133,4 +178,5 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+
 
