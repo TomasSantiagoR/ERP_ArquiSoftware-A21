@@ -1,10 +1,227 @@
 ﻿@page
 @model ERP_ArquiSoftware.Pages.Inventario.HomeInvModel
 @{
+    ViewData["Title"] = "Inventario · Resumen";
 }
-<a asp-page="/Inventario/IndexInv" class="btn btn-primary">Ver listado de productos</a>
 
-<a asp-page="/Maestros/Marcas/Index" class="btn btn-primary">Gestionar Marcas</a>
-<a asp-page="/Maestros/Unidades/Index" class="btn btn-primary">Gestionar Unidad de medida</a>
-<a asp-page="/Maestros/Impuestos/Index" class="btn btn-primary">Gestionar Impuestos</a>
+@section Styles {
+    <style>
+        .kpi-card {
+            border: 1px solid rgba(0,0,0,.07);
+            border-radius: 14px;
+            padding: 16px;
+            background: #fff;
+        }
+
+        .kpi-title {
+            font-size: .85rem;
+            color: #6c757d;
+            margin: 0;
+        }
+
+        .kpi-value {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .subtle {
+            color: #6c757d;
+        }
+
+        .chart-card {
+            border: 1px solid rgba(0,0,0,.07);
+            border-radius: 14px;
+            background: #fff;
+            padding: 16px;
+            height: 100%;
+        }
+
+        .chart-fixed {
+            position: relative;
+            height: 280px; 
+            
+        }
+
+        .table-compact td, .table-compact th {
+            padding: .35rem .5rem;
+            font-size: .9rem;
+        }
+    </style>
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="m-0">Inventario — Resumen</h3>
+        <div class="d-flex gap-2">
+            <a asp-page="/Inventario/IndexInv" class="btn btn-primary">
+                <i class="ri-list-check"></i> Ver productos
+            </a>
+            <a asp-page="/Maestros/Marcas/Index" class="btn btn-outline-secondary">Marcas</a>
+            <a asp-page="/Maestros/Unidades/Index" class="btn btn-outline-secondary">Unidades</a>
+            <a asp-page="/Maestros/Impuestos/Index" class="btn btn-outline-secondary">Impuestos</a>
+        </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="row g-3 mb-3">
+        <div class="col-6 col-md-3">
+            <div class="kpi-card">
+                <p class="kpi-title">Productos activos</p>
+                <p class="kpi-value">@Model.Resumen.ProductosActivos</p>
+                <p class="subtle m-0">Inactivos: @Model.Resumen.ProductosInactivos</p>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="kpi-card">
+                <p class="kpi-title">Stock bajo</p>
+                <p class="kpi-value">@Model.Resumen.ConStockBajo</p>
+                <p class="subtle m-0">Almacenes: @Model.Resumen.TotalAlmacenes</p>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="kpi-card">
+                <p class="kpi-title">Categorías</p>
+                <p class="kpi-value">@Model.Resumen.TotalCategorias</p>
+                <p class="subtle m-0">Distribución abajo</p>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="kpi-card">
+                <p class="kpi-title">Valor (estimado)</p>
+                <p class="kpi-value">@Model.Resumen.ValorInventario.ToString("C0")</p>
+                <p class="subtle m-0">PrecioUnitario × Stock</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficas -->
+    <div class="row g-3">
+        <div class="col-12 col-xl-4">
+            <div class="chart-card">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="m-0">Estado general</h6>
+                </div>
+                <div class="chart-fixed">
+                    <canvas id="chartEstado"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-xl-4">
+            <div class="chart-card">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="m-0">Top stock bajo</h6>
+                    <small class="subtle">Top @Model.Resumen.LowStock.Count</small>
+                </div>
+                <div class="chart-fixed">
+                    <canvas id="chartLow"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-xl-4">
+            <div class="chart-card">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="m-0">Productos por categoría</h6>
+                </div>
+                <div class="chart-fixed">
+                    <canvas id="chartCat"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de alertas -->
+    <div class="card mt-3">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <strong>Alertas de stock bajo</strong>
+            <a asp-page="/Notificaciones/Index" class="btn btn-sm btn-outline-secondary">
+                Ver notificaciones
+            </a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-compact m-0">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Categoría</th>
+                        <th>Stock</th>
+                        <th>Punto reorden</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Resumen.LowStock.Any())
+                    {
+                        foreach (var r in Model.Resumen.LowStock)
+                        {
+                            <tr class="table-warning">
+                                <td>@r.Nombre</td>
+                                <td>@r.Categoria</td>
+                                <td>@r.Stock</td>
+                                <td>@(r.PuntoReorden?.ToString() ?? "—")</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="4" class="text-center text-muted py-3">Sin alertas.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script>
+        // Datos desde el backend
+        const estado = {
+            activos: @Model.Resumen.ProductosActivos,
+            inactivos: @Model.Resumen.ProductosInactivos,
+            bajo: @Model.Resumen.ConStockBajo
+        };
+        const low = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+                    Model.Resumen.LowStock.Select(x => new { x.Nombre, x.Stock, x.PuntoReorden })
+            ));
+    const cat = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+                Model.Resumen.PorCategoria.Select(x => new { x.Categoria, x.Cantidad })
+        ));
+
+    // Donut estado
+    new Chart(document.getElementById('chartEstado'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Activos','Inactivos','Stock bajo'],
+            datasets: [{ data: [estado.activos, estado.inactivos, estado.bajo] }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+
+        // Barras low stock
+        new Chart(document.getElementById('chartLow'), {
+            type: 'bar',
+            data: {
+                labels: low.map(x => x.Nombre),
+                datasets: [{
+                    label: 'Stock',
+                    data: low.map(x => x.Stock)
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                scales: { y: { beginAtZero: true, ticks: { precision:0 }}}
+            }
+        });
+
+        // Pie por categoría
+        new Chart(document.getElementById('chartCat'), {
+            type: 'pie',
+            data: {
+                labels: cat.map(x => x.Categoria),
+                datasets: [{ data: cat.map(x => x.Cantidad) }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    </script>
+}
 

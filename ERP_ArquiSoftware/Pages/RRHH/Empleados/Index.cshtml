@@ -17,7 +17,8 @@
 </form>
 
 <div class="card">
-    <div class="table-responsive">
+    <!-- Importante: permitir overflow vertical para que el dropdown no se recorte -->
+    <div class="table-responsive" style="overflow-y:visible; overflow-x:auto;">
         <table class="table table-striped table-hover align-middle m-0">
             <thead>
                 <tr>
@@ -31,38 +32,68 @@
                     <th>Cargo</th>
                     <th>Activo</th>
                     <th>Ingreso</th>
-                    <th></th>
+                    <th style="width: 120px;"></th>
                 </tr>
             </thead>
             <tbody>
-            @if (Model.Items.Any())
-            {
-                foreach (var e in Model.Items)
+                @if (Model.Items.Any())
                 {
-                    <tr>
-                        <td>@e.Id</td>
-                        <td>@e.Documento</td>
-                        <td>@($"{e.Nombres} {e.Apellidos}")</td>
-                        <td>@e.Correo</td>
-                        <td>@e.Telefono</td>
-                        <td>@(e.Almacen?.Nombre ?? "—")</td>
-                        <td>@(e.Departamento?.Nombre ?? "—")</td>
-                        <td>@(e.Cargo?.Nombre ?? "—")</td>
-                        <td>
-                            @if (e.Activo) { <span class="badge bg-success">Activo</span> }
-                            else { <span class="badge bg-secondary">Inactivo</span> }
-                        </td>
-                        <td>@e.FechaIngreso.ToString("yyyy-MM-dd")</td>
-                        <td class="text-end">
-                            <a asp-page="Edit" asp-route-id="@e.Id" class="btn btn-sm btn-primary">Editar</a>
-                        </td>
-                    </tr>
+                    foreach (var e in Model.Items)
+                    {
+                        <tr>
+                            <td>@e.Id</td>
+                            <td>@e.Documento</td>
+                            <td>@($"{e.Nombres} {e.Apellidos}")</td>
+                            <td>@e.Correo</td>
+                            <td>@e.Telefono</td>
+                            <td>@(e.Almacen?.Nombre ?? "—")</td>
+                            <td>@(e.Departamento?.Nombre ?? "—")</td>
+                            <td>@(e.Cargo?.Nombre ?? "—")</td>
+                            <td>
+                                @if (e.Activo)
+                                {
+                                    <span class="badge bg-success">Activo</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Inactivo</span>
+                                }
+                            </td>
+                            <td>@e.FechaIngreso.ToString("yyyy-MM-dd")</td>
+                            <td class="text-end">
+                                <div class="btn-group">
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                            data-bs-toggle="dropdown"
+                                            data-bs-display="static"
+                                            data-bs-boundary="viewport"
+                                            data-bs-offset="0,8"
+                                            aria-expanded="false">
+                                        Opciones
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li>
+                                            <a class="dropdown-item"
+                                               asp-page="Edit" asp-route-id="@e.Id">
+                                                Editar
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item"
+                                               asp-page="Actions" asp-route-id="@e.Id">
+                                                Acciones
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    }
                 }
-            }
-            else
-            {
-                <tr><td colspan="11" class="text-center py-4 text-muted">No hay resultados.</td></tr>
-            }
+                else
+                {
+                    <tr><td colspan="11" class="text-center py-4 text-muted">No hay resultados.</td></tr>
+                }
             </tbody>
         </table>
     </div>

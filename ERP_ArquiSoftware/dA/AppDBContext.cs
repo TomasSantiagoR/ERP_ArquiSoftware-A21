@@ -49,6 +49,15 @@ namespace ERP_ArquiSoftware.dA
         public DbSet<Cargo> Cargos { get; set; }
         public DbSet<Contrato> Contratos { get; set; }
         public DbSet<TipoContrato> TiposContrato { get; set; }
+        public DbSet<PeriodoNomina> PeriodosNomina { get; set; }
+        public DbSet<Nomina> Nominas { get; set; }
+        public DbSet<Liquidacion> Liquidaciones { get; set; }
+        // RRHH - parámetros y novedades
+        public DbSet<ParamNomina> ParametrosNomina { get; set; }
+        public DbSet<NovedadNomina> NovedadesNomina { get; set; }
+
+        // Notis
+        public DbSet<Notificacion> Notificaciones { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -213,6 +222,10 @@ namespace ERP_ArquiSoftware.dA
                 .Property(pp => pp.PrecioCompra).HasColumnType("decimal(18,2)");
             modelBuilder.Entity<Impuesto>()
                 .Property(i => i.Porcentaje).HasColumnType("decimal(5,2)");
+            //notis
+            modelBuilder.Entity<Notificacion>()
+                    .HasIndex(n => new { n.Tipo, n.ProductoId, n.AlmacenId, n.Visto, n.Creado });
+
 
             // ======================= RRHH ========================
 
@@ -263,6 +276,23 @@ namespace ERP_ArquiSoftware.dA
             modelBuilder.Entity<Contrato>()
                 .Property(c => c.Salario)
                 .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<ParamNomina>().HasData(new ParamNomina
+            {
+                Id = 1,
+                Anio = DateTime.Now.Year,
+                SMMLV = 1300000m,
+                AuxilioTransporte = 162000m,
+                TopeAuxTranspMultiplo = 2,
+                SaludEmpleadoPorc = 0.04m,
+                PensionEmpleadoPorc = 0.04m,
+                CesantiasPorc = 0.0833m,
+                InteresesCesantiasAnualPorc = 0.12m,
+                PrimaPorc = 0.0833m,
+                VacacionesPorc = 0.0417m,
+                DiasMes = 30,
+                Activo = true
+            });
         }
     }
 }

@@ -2,11 +2,16 @@
 @inject IAuthorizationService Auth
 @{
     var isAuth = User?.Identity?.IsAuthenticated ?? false;
-    var canVentas = isAuth && (await Auth.AuthorizeAsync(User, "Ventas")).Succeeded;
-    var canInvRead = isAuth && (await Auth.AuthorizeAsync(User, "Inventario.Read")).Succeeded;
-    var canRRHH = isAuth && (await Auth.AuthorizeAsync(User, "RRHH")).Succeeded;
+
+    var canVentas = isAuth && (await Auth.AuthorizeAsync(User!, "Ventas")).Succeeded;
+    var canInvRead = isAuth && (await Auth.AuthorizeAsync(User!, "Inventario.Read")).Succeeded;
+    var canRRHH = isAuth && (await Auth.AuthorizeAsync(User!, "RRHH")).Succeeded;
 
     var displayName = User?.Identity?.Name ?? "Invitado";
+
+    // Contador de notificaciones no leídas (opcional)
+    var notifCountObj = ViewData["NotifCount"];
+    int? notifCount = notifCountObj is int c ? c : null;
 }
 
 <ul class="sidebar__list">
@@ -29,6 +34,25 @@
             <span class="sidebar__text">Dashboard</span>
         </div>
     </li>
+
+    <!-- Notificaciones -->
+    @if (isAuth)
+    {
+        <li class="sidebar__element position-relative">
+            <a class="sidebar__icon position-relative" asp-area="" asp-page="/Notificaciones/Index" title="Notificaciones">
+                <i class="ri-notification-3-line"></i>
+                @if (notifCount.HasValue && notifCount.Value > 0)
+                {
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        @((notifCount.Value > 99) ? "99+" : notifCount.Value.ToString())
+                    </span>
+                }
+            </a>
+            <div class="sidebar__hide">
+                <span class="sidebar__text">Notificaciones</span>
+            </div>
+        </li>
+    }
 
     <!-- Ventas -->
     @if (canVentas)
@@ -72,7 +96,7 @@
         </li>
     }
 
-    <!-- Proveedores (si quieres restringir, crea policy y cámbiala aquí) -->
+    <!-- Proveedores -->
     @if (isAuth)
     {
         <li class="sidebar__element">
@@ -132,6 +156,7 @@
         </div>
     </li>
 </ul>
+
 
 
 
