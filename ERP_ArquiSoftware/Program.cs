@@ -144,7 +144,7 @@ static async Task SeedIdentityAsync(IServiceProvider services)
     if (admin == null)
     {
         admin = new IdentityUser { UserName = adminEmail, Email = adminEmail, EmailConfirmed = true };
-        await userMgr.CreateAsync(admin, "Admin123!");
+        //await userMgr.CreateAsync(admin, "Admin123!");
         await userMgr.AddToRoleAsync(admin, "Admin");
     }
 
